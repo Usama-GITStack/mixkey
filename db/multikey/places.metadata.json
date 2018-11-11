@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"multikey.places"},{"v":2,"key":{"languages":1},"name":"languages_1","ns":"multikey.places","background":true},{"v":2,"key":{"languages":1,"loc":"2dsphere"},"name":"languages_1_loc_2dsphere","ns":"multikey.places","background":true,"2dsphereIndexVersion":3}],"uuid":"227401b38cd3423bba9d07cc6dcfdf1f"}

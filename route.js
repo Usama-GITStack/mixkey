@@ -2,7 +2,7 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let app = express.Router();
 const path = require('path')
-console.log(path)
+debugger;
 app.use('/apidoc', express.static('apidoc'));
 app.use('/admin', express.static('admin'));
 app.use('/api/v1/user', require('./modules/user/userRoute'));
