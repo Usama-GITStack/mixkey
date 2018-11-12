@@ -3,7 +3,10 @@ let utils = require('./utils');
 const FCM = require('fcm-push')
 let fcm = new FCM(process.env.serverKey);
 let notificationUtil = {};
-
+var OneSignal = require('onesignal-node');
+var oneSignalClient = new OneSignal.client({
+  app: { appAuthKey:  process.env.ONESIGNAL_API_KEY, appId: process.env.ONESIGNAL_APP_ID }
+});
 notificationUtil.getNotificationType = (type) => {
     if (typeof type === "undefined")
         type = "DEFAULT";
@@ -51,6 +54,7 @@ notificationUtil.createNotification = (data) => {
 /*
  * Send notifiction to ios
  */
+/*
 notificationUtil.sendNotification = (data, deviceToken, cb) => {
     if (!utils.empty(deviceToken)) {
         data.topic = process.env.APP_IDENTIFIER;
@@ -84,7 +88,25 @@ notificationUtil.sendNotification = (data, deviceToken, cb) => {
         }
     }
 };
+*/
 
+notification.sendPushNotification = (data, deviceToken, cb) => {
+  var notification = OneSignal.Notification({
+    contents: {
+      en: data
+    },
+    include_player_ids: [deviceToken],
+  });
+  oneSignalClient.sendNotification(notification, function(err, httpResponse, data) {
+    if(err){
+      console.log("err:");
+      console.log(httpResponse);
+      console.log(err);
+    } else {
+      console.log('sent')
+    }
+  });
+}
 
 /**
  * Android push notification
@@ -92,7 +114,7 @@ notificationUtil.sendNotification = (data, deviceToken, cb) => {
  * @param {*} deviceToken 
  * @param {*} cb 
  */
-
+/*
 notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
     var message = {
         to: deviceToken, // required fill with device token or topics
@@ -109,5 +131,5 @@ notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
     //callback style
     fcm.send(message, cb);
 }
-
+*/
 module.exports = notificationUtil;
