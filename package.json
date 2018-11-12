@@ -4,6 +4,7 @@
     "description": "multikey Project",
     "main": "server.js",
     "scripts": {
+        "ng": "ng",
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "ng serve --port 4200"
     },
