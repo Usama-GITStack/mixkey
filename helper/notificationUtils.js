@@ -4,8 +4,17 @@ const FCM = require('fcm-push')
 let fcm = new FCM(process.env.serverKey);
 let notificationUtil = {};
 var OneSignal = require('onesignal-node');
+var Pusher = require('pusher');
 var oneSignalClient = new OneSignal.Client({
   app: { appAuthKey:  process.env.ONESIGNAL_API_KEY, appId: process.env.ONESIGNAL_APP_ID }
+});
+
+var pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
+  cluster: 'eu',
+  encrypted: true
 });
 notificationUtil.getNotificationType = (type) => {
     if (typeof type === "undefined")
@@ -97,6 +106,11 @@ notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
     },
     include_player_ids: [deviceToken],
   });
+
+  pusher.trigger('message_'+deviceToken, 'new-message-sent', {
+    "message": data
+  });
+
   oneSignalClient.sendNotification(notification, function(err, httpResponse, data) {
     if(err){
       console.log("err:");
