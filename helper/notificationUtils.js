@@ -4,7 +4,7 @@ const FCM = require('fcm-push')
 let fcm = new FCM(process.env.serverKey);
 let notificationUtil = {};
 var OneSignal = require('onesignal-node');
-var oneSignalClient = new OneSignal.client({
+var oneSignalClient = new OneSignal.Client({
   app: { appAuthKey:  process.env.ONESIGNAL_API_KEY, appId: process.env.ONESIGNAL_APP_ID }
 });
 notificationUtil.getNotificationType = (type) => {
@@ -90,7 +90,7 @@ notificationUtil.sendNotification = (data, deviceToken, cb) => {
 };
 */
 
-notification.sendPushNotification = (data, deviceToken, cb) => {
+notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
   var notification = OneSignal.Notification({
     contents: {
       en: data
@@ -110,9 +110,9 @@ notification.sendPushNotification = (data, deviceToken, cb) => {
 
 /**
  * Android push notification
- * @param {*} data 
- * @param {*} deviceToken 
- * @param {*} cb 
+ * @param {*} data
+ * @param {*} deviceToken
+ * @param {*} cb
  */
 /*
 notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
