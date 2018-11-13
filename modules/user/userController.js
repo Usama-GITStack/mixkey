@@ -632,12 +632,9 @@ userCtr.sendmsgNotification = (req, res) => {
     let userId = req.authUser._id;
     let input = req.body;
     installationModel.loadByOwnerAndInstallation(input.userId, (err, deviceDetails) => {
-        console.log("Dfdsfdsfd")
-        console.log(input.userId)
-        console.log(deviceDetails)
         if (utils.empty(err)) {
             if (!utils.empty(deviceDetails) && deviceDetails.length > 0) {
-                // notificationUtils.sendPushNotification(input, deviceDetails[0].deviceToken, (err, user) => {});
+                notificationUtils.sendPushNotification(input, deviceDetails[0].deviceToken, (err, user) => {});
             }
         }
     });

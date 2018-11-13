@@ -27,9 +27,7 @@ notificationUtil.getNotificationType = (type) => {
 
 notificationUtil.sendPusherNotification = (data, senderId, messageObj) => {
     var channelName = "message_"+senderId + "_" + data.userId;
-    console.log(channelName)
-    pusher.trigger(channelName, 'new-message-sent', {
-        'data': {
+    var msg = {
             "read": messageObj.read,
             "createdAt": messageObj.createdAt,
             "updatedAt": messageObj.updatedAt,
@@ -38,8 +36,9 @@ notificationUtil.sendPusherNotification = (data, senderId, messageObj) => {
             "to": messageObj.to,
             "from": messageObj.from
         }
+    pusher.trigger(channelName, 'new-message-sent', {
+        'data': msg
     });
-
 };
 
 notificationUtil.createNotification = (data) => {
@@ -117,26 +116,37 @@ notificationUtil.sendNotification = (data, deviceToken, cb) => {
 */
 
 notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
-  var notification = OneSignal.Notification({
-    contents: {
-      en: data
-    },
-    include_player_ids: [deviceToken],
-  });
+    var firstNotification = new OneSignal.Notification({
+        contents: {
+            en: "You have received a new message"
+        },
+        include_player_ids: [deviceToken]
+    });
 
-  pusher.trigger('message', 'new-message-sent', {
-    "message": data
-  });
+    oneSignalClient.sendNotification(firstNotification, function (err, httpResponse,data) {
+       if (err) {
+           console.log('Something went wrong...');
+       } else {
+           console.log(data);
+       }
+    });
+  // var notification = OneSignal.Notification({
+  //   contents: {
+  //     en: data
+  //   },
+  //   include_player_ids: [deviceToken],
+  // });
 
-  oneSignalClient.sendNotification(notification, function(err, httpResponse, data) {
-    if(err){
-      console.log("err:");
-      console.log(httpResponse);
-      console.log(err);
-    } else {
-      console.log('sent')
-    }
-  });
+
+  // oneSignalClient.sendNotification(notification, function(err, httpResponse, data) {
+  //   if(err){
+  //     console.log("err:");
+  //     console.log(httpResponse);
+  //     console.log(err);
+  //   } else {
+  //     console.log('sent')
+  //   }
+  // });
 }
 
 /**
