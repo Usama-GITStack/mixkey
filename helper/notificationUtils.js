@@ -25,9 +25,19 @@ notificationUtil.getNotificationType = (type) => {
     return types[type];
 };
 
-notificationUtil.sendPusherNotification = (data) => {
-    pusher.trigger('message', 'new-message-sent', {
-        "message": data
+notificationUtil.sendPusherNotification = (data, senderId, messageObj) => {
+    var channelName = "message_"+senderId + "_" + data.userId;
+    console.log(channelName)
+    pusher.trigger(channelName, 'new-message-sent', {
+        'data': {
+            "read": messageObj.read,
+            "createdAt": messageObj.createdAt,
+            "updatedAt": messageObj.updatedAt,
+            "_id": messageObj._id,
+            "message": messageObj.message,
+            "to": messageObj.to,
+            "from": messageObj.from
+        }
     });
 
 };

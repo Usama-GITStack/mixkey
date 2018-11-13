@@ -631,16 +631,18 @@ userCtr.installation = (req, res) => {
 userCtr.sendmsgNotification = (req, res) => {
     let userId = req.authUser._id;
     let input = req.body;
-
     installationModel.loadByOwnerAndInstallation(input.userId, (err, deviceDetails) => {
+        console.log("Dfdsfdsfd")
+        console.log(input.userId)
+        console.log(deviceDetails)
         if (utils.empty(err)) {
             if (!utils.empty(deviceDetails) && deviceDetails.length > 0) {
-                notificationUtils.sendPushNotification(input, deviceDetails[0].deviceToken, (err, user) => {});
+                // notificationUtils.sendPushNotification(input, deviceDetails[0].deviceToken, (err, user) => {});
             }
         }
     });
 
-    notificationUtils.sendPusherNotification(input, (err, user) => {});
+
 
     waterfall([
         (callback) => {
@@ -656,6 +658,7 @@ userCtr.sendmsgNotification = (req, res) => {
                 if (!!err) {
                     callback(err);
                 } else {
+                    notificationUtils.sendPusherNotification(input, userId, messageObj, (err, user) => {});
                     userCtr.updateMessagesId(messageObj._id, userId, input.userId);
                     callback(null);
                 }

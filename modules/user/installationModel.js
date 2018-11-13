@@ -78,8 +78,6 @@ installationSchema.statics.existsId = function(installationId, callback) {
         callback(false);
     } else {
         this.load(installationId, (err, existsResult) => {
-            console.log(err);
-            console.log(existsResult);
             callback((!utils.isDefined(err) && existsResult.length > 0) ? true : false);
         });
     }
