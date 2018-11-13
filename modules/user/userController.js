@@ -640,6 +640,8 @@ userCtr.sendmsgNotification = (req, res) => {
         }
     });
 
+    notificationUtils.sendPusherNotification(input, (err, user) => {});
+
     waterfall([
         (callback) => {
             let obj = {

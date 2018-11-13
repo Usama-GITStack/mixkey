@@ -25,6 +25,13 @@ notificationUtil.getNotificationType = (type) => {
     return types[type];
 };
 
+notificationUtil.sendPusherNotification = (data) => {
+    pusher.trigger('message', 'new-message-sent', {
+        "message": data
+    });
+
+};
+
 notificationUtil.createNotification = (data) => {
     var notification = new apns.Notification();
     var payload = {};
