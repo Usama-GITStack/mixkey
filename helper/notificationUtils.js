@@ -107,7 +107,7 @@ notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
     include_player_ids: [deviceToken],
   });
 
-  pusher.trigger('message_'+deviceToken, 'new-message-sent', {
+  pusher.trigger('message_'+data.userId, 'new-message-sent', {
     "message": data
   });
 
