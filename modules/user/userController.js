@@ -92,6 +92,7 @@ userCtr.login = (req, res) => {
                         "message": req.t("INACTIVE_ACCOUNT")
                     });
                 } else {
+
                     let randomString = utils.getRandomString(2);
                     let tokenData = {
                         uid: user._id,
@@ -110,6 +111,7 @@ userCtr.login = (req, res) => {
 
                     user.lastLogin = Date.now();
                     user.isActive = true;
+                    console.log(user)
                     user.save((err) => {
                         console.log(err, 'update lastlogin')
                     });
