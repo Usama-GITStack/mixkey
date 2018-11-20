@@ -146,9 +146,9 @@ utils.sendEmail = (toEmail, subject, body, callback) => {
 }
 
 utils.resize = (file, type, imagePath, userId, userThumbDir, requiredSize, cb) => {
-    // console.log("resizeUserIcon");  
+    // console.log("resizeUserIcon");
     let currentFile = utils;
-    // let imagePath = config.AWS_URL + config.ADVT_IMAGE_PATH + fileName; 
+    // let imagePath = config.AWS_URL + config.ADVT_IMAGE_PATH + fileName;
 
     let options = url.parse(imagePath);
     https.get(options, function(response) {
@@ -242,7 +242,7 @@ utils.uploadFile = (file, storagePath, type, cb) => {
     let response = { "data": [], "error": "" };
     let fileData = [];
     let configS3 = config.AWS_CONFIG;
-    configS3 = _.extend(configS3, { apiVersion: '2006-03-01' });
+    // configS3 = _.extend(configS3, { apiVersion: '2006-03-01' });
     let s3 = new AWS.S3(configS3);
     if (type == "files") {
         for (var key in files) {
@@ -392,7 +392,7 @@ utils.checkValidPdfFile = (file, req) => {
 
     // if (file.size > config.MAX_FILE_UPLOAD_SIZE) {
     //     error = req.t("IMAGE_LARGE");
-    // } else 
+    // } else
     if (allowExtension.indexOf(extension.toLowerCase()) == -1) {
         error = req.t("PDF_NOT_VALID");
     }

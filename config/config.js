@@ -18,6 +18,10 @@ config.AWS_CONFIG = {
     "secretAccessKey": process.env.AWS_SECRET_KEY,
     "region": process.env.AWS_REGION
 };
+config.baseURL  = "https://s3."+process.env.AWS_REGION+".amazonaws.com/"+process.env.BUCKET_NAME;
+config.placeURL = config.baseURL + '/place/'
+config.eventURL = config.baseURL + '/event/'
+config.userURL = config.baseURL + '/user/'
 config.NOTIFICATION_OPTIONS = {
     token: {
         key: process.env.APPLE_KEY, // Path to the key p8 file

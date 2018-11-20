@@ -79,7 +79,8 @@ placeCtr.createPlace = (req, res) => {
                     "message": "",
                     data: placeDetails,
                     status: true,
-                    imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/place/",
+                    // imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/place/",
+                    imageurlPath: config.placeURL,
                 }
                 return res.status(200).json(response);
             }
@@ -126,7 +127,8 @@ placeCtr.getPlaceList = (req, res) => {
                 pagination: pagination,
                 data: placeCtr.setWishlistFlag(places, loginUserId),
                 status: true,
-                imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/place/",
+                // imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/place/",
+                imageurlPath: config.placeURL,
                 message: ""
             });
         } else {
@@ -151,6 +153,7 @@ placeCtr.setWishlistFlag = (places, loginUserId) => {
             });
         }
         obj["placeFlag"] = (temp == 1) ? 1 : 0
+        obj["imageURL"] = config.placeURL
         delete obj.wishlist;
     })
     return places;

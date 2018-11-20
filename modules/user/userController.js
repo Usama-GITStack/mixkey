@@ -420,6 +420,13 @@ userCtr.getUserList = (req, res) => {
             });
         } else if (total > 0) {
             let pages = Math.ceil(total / limit);
+            let newUsers = users.map( (obj) => {
+                obj.imageURL = config.userURL;
+                return obj;
+            });
+            console.log("<<<<>>>>>>>")
+            console.log(newUsers)
+            console.log("<<<<>>>>>>>")
             let pagination = {
                 pages: pages ? pages : 1,
                 total: total,
@@ -427,9 +434,9 @@ userCtr.getUserList = (req, res) => {
             };
             res.status(200).json({
                 pagination: pagination,
-                data: users,
+                data: newUsers,
                 status: true,
-                imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/user/",
+                imageurlPath: config.userURL,
                 message: ""
             });
         } else {
@@ -557,7 +564,7 @@ userCtr.updateUser = (req, res) => {
                 "message": req.t("DB_ERROR")
             });
         } else {
-            userDetail['imagePath'] = "https://s3.ap-south-1.amazonaws.com/multikeybucket/user/" + userDetail.profilePic;
+            userDetail['imagePath'] = config.userURL + userDetail.profilePic;
             userDetail['secretToken'] = req.headers['x-auth-token'];
             return res.status(200).json({
                 data: userDetail,
@@ -879,7 +886,7 @@ userCtr.getContactUserList = (req, res) => {
                 data: userList,
                 status: true,
                 message: "",
-                imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/user/",
+                imageurlPath: config.userURL,
             });
         } else {
             res.status(400).json({
@@ -1420,9 +1427,9 @@ userCtr.nearby = (req, res) => {
                 events: [],
                 status: true,
                 "message": "",
-                eventImageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/event/",
-                placeImageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/place/",
-                userImageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/user/",
+                eventImageurlPath: config.eventURL,
+                placeImageurlPath: config.placeURL,
+                userImageurlPath: config.userURL,
             };
             if (!!eventList.user) {
                 responce.user = eventList.user;

@@ -4,9 +4,10 @@ validator.getEventValidator = (req, type) => {
         create: {
             title: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Title" })],
             description: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Description" })],
-            startDate: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Evemnt start date" })],
-            endDate: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Evemnt end date" })],
-            eventFee: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Evemnt fee" })],
+            eventDate: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Event date" })],
+            // startDate: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Event start date" })],
+            // endDate: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Event end date" })],
+            eventFee: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Event fee" })],
             location: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Location" })],
             latitude: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Latitude" })],
             longitude: ["notEmpty", req.t("FIELD_REQUIRED", { FIELD: "Longitude" })],

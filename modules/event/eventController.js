@@ -85,7 +85,7 @@ eventCtr.createEvent = (req, res) => {
                     "message": "",
                     data: eventDetails,
                     status: true,
-                    imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/event/",
+                    imageurlPath: config.eventURL,
                 }
                 return res.status(200).json(response);
             }
@@ -136,7 +136,7 @@ eventCtr.getEventList = (req, res) => {
                 pagination: pagination,
                 data: eventCtr.setWishlistFlag(events, loginUserId),
                 status: true,
-                imageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/event/",
+                imageurlPath: config.eventURL,
                 message: ""
             });
         } else {
@@ -161,6 +161,7 @@ eventCtr.setWishlistFlag = (places, loginUserId) => {
             });
         }
         obj["eventFlag"] = (temp == 1) ? 1 : 0
+        obj["imageURL"] = config.eventURL;
         delete obj.wishlist;
     })
     return places;
