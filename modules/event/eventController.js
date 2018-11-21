@@ -178,7 +178,6 @@ eventCtr.getActiveEventList = (req, res) => {
   if (!utils.empty(input.searchName)) {
     filter.title = new RegExp(input.searchName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
   }
-  console.log(filter);
   eventModel.eventList(filter, pg, limit, loginUserId, (err, total, events) => {
     if (!!err) {
       res.status(500).json({
