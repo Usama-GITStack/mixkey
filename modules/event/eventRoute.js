@@ -39,12 +39,11 @@ let eventRouter = express.Router();
  * @apiDefine ServerError
  *
  * @apiError 500 Server Error
- * 
+ *
  * @apiErrorExample Error: 500
  *  HTTP/1.1 500 ServerError
  *   Some error occured. Please try again.
  */
-
 
 /**
  * @api {post} /event/create Create event
@@ -66,15 +65,7 @@ let eventRouter = express.Router();
  * @apiUse ServerError
  */
 
-let createMiddleware = [
-    multipartMiddleware,
-    auth.isAuthenticatedUser,
-    eventMiddleware.validateInput("create"),
-    eventMiddleware.checkImage,
-    eventMiddleware.titleExists,
-    eventMiddleware.checkDate,
-    eventCtr.createEvent
-];
+let createMiddleware = [multipartMiddleware, auth.isAuthenticatedUser, eventMiddleware.validateInput('create'), eventMiddleware.checkImage, eventMiddleware.titleExists, eventMiddleware.checkDate, eventCtr.createEvent];
 eventRouter.post('/create', createMiddleware);
 
 /**
@@ -96,16 +87,8 @@ eventRouter.post('/create', createMiddleware);
  * @apiUse ServerError
  */
 
-let updateeventsMiddleware = [
-    multipartMiddleware,
-    auth.isAuthenticatedUser,
-    eventMiddleware.validateInput("update"),
-    eventMiddleware.titleExists,
-    eventMiddleware.checkDate,
-    eventCtr.updateEvent
-];
+let updateeventsMiddleware = [multipartMiddleware, auth.isAuthenticatedUser, eventMiddleware.validateInput('update'), eventMiddleware.titleExists, eventMiddleware.checkDate, eventCtr.updateEvent];
 eventRouter.post('/update', updateeventsMiddleware);
-
 
 /**
  * @api {post} /event/eventList/:pg Get eventList
@@ -120,11 +103,24 @@ eventRouter.post('/update', updateeventsMiddleware);
  * @apiUse ServerError
  */
 
-let geteventsMiddleware = [
-    auth.isAuthenticatedUser,
-    eventCtr.getEventList
-];
+let geteventsMiddleware = [auth.isAuthenticatedUser, eventCtr.getEventList];
 eventRouter.post('/eventList', geteventsMiddleware);
+
+/**
+ * @api {post} /event/eventList/Active Get eventList
+ * @apiName Get event
+ * @apiGroup event
+ * @apiUse TokenHeader
+ * @apiVersion 1.0.0
+ * @apiParam {Number} [pg] page number.
+ * @apiParam {Number} [status] status (ACTIVE/INACTIVE).
+ * @apiSuccessExample Success-Response
+ *     HTTP/1.1 200 OK
+ * @apiUse ServerError
+ */
+
+let geteventsActiveMiddleware = [auth.isAuthenticatedUser, eventCtr.getActiveEventList];
+eventRouter.post('/activeEventList', geteventsActiveMiddleware);
 
 /**
  * @api {post} /event/deleteevent delete event
@@ -139,13 +135,7 @@ eventRouter.post('/eventList', geteventsMiddleware);
  * @apiUse ServerError
  */
 
-let deleteEventMiddleware = [
-    multipartMiddleware,
-    auth.isAuthenticatedUser,
-    eventMiddleware.validateId,
-    eventCtr.deleteEvent
-];
+let deleteEventMiddleware = [multipartMiddleware, auth.isAuthenticatedUser, eventMiddleware.validateId, eventCtr.deleteEvent];
 eventRouter.post('/deleteEvent', deleteEventMiddleware);
-
 
 module.exports = eventRouter;
