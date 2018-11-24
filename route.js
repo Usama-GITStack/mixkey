@@ -2,7 +2,14 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let app = express.Router();
 const path = require('path')
-debugger;
+var Rollbar = require("rollbar");
+var rollbar = new Rollbar({
+  accessToken: '0f9ec5a39fb244f3bfc15308e9a64f0b',
+  captureUncaught: true,
+  captureUnhandledRejections: true
+});
+
+// record a generic message and send it to Rollbar
 app.use('/apidoc', express.static('apidoc'));
 app.use('/admin', express.static('admin'));
 app.use('/api/v1/user', require('./modules/user/userRoute'));
