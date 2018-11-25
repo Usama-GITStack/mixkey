@@ -1452,7 +1452,13 @@ userCtr.setWishlistFlag = (places, loginUserId, type_) => {
         temp = 0;
         if (!!obj.wishlist && obj.wishlist.length > 0) {
             obj.wishlist.map((item) => {
-                if (item.eventPlaceType === type_ && item.eventId.toString() == obj._id.toString() && item.userId.toString() == loginUserId.toString()) {
+                if (item.eventPlaceType === type_ &&
+                    item.eventId != undefined &&
+                    obj._id != undefined &&
+                    item.userId != undefined &&
+                    loginUserId != undefined &&
+                    item.eventId.toString() == obj._id.toString()
+                    && item.userId.toString() == loginUserId.toString()) {
                     temp = 1;
                 }
             });
