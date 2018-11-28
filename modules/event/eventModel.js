@@ -25,7 +25,7 @@ let eventSchema = new schema({
     },
     endDate: {
         type: Date,
-        required: true
+        required: false
     },
     eventFee: {
         type: String,

@@ -39,8 +39,9 @@ eventCtr.createEvent = (req, res) => {
         let eventData = {
           title: input.title.toLowerCase(),
           description: input.description,
-          startDate: input.startDate,
-          endDate: input.endDate,
+          startDate: input.eventDate,
+          // startDate: input.startDate,
+          // endDate: input.endDate,
           eventFee: input.eventFee,
           location: input.location,
           status: 'ACTIVE',
@@ -262,7 +263,8 @@ eventCtr.updateEvent = (req, res) => {
           eventData.description = input.description;
         }
         if (!utils.empty(input.startDate)) {
-          eventData.startDate = input.startDate;
+          // eventData.startDate = input.startDate;
+          eventData.startDate = input.eventDate;
         }
         if (!utils.empty(input.endDate)) {
           eventData.endDate = input.endDate;
@@ -299,8 +301,10 @@ eventCtr.updateEvent = (req, res) => {
           eventData,
           err => {
             if (!!err) {
+              console.log(err)
               callback(err);
             } else {
+              console.log(err)
               callback(null);
             }
           },
