@@ -39,9 +39,9 @@ eventCtr.createEvent = (req, res) => {
         let eventData = {
           title: input.title.toLowerCase(),
           description: input.description,
-          startDate: input.eventDate,
+          startDate: input.eventStartDate,
           // startDate: input.startDate,
-          // endDate: input.endDate,
+          endDate: input.eventEndDate,
           eventFee: input.eventFee,
           location: input.location,
           status: 'ACTIVE',
@@ -156,7 +156,7 @@ eventCtr.getActiveEventList = (req, res) => {
   let input = req.body;
   let loginUserId = req.authUser._id;
   let currentDate = new Date();
-  let filter = { startDate: { $gt: currentDate } };
+  let filter = { startDate: { $lt: currentDate }, endDate: { $gt: currentDate } };
   filter.status = 'ACTIVE';
   if (!utils.empty(input.title)) {
     filter.title = {
@@ -262,12 +262,12 @@ eventCtr.updateEvent = (req, res) => {
         if (!utils.empty(input.description)) {
           eventData.description = input.description;
         }
-        if (!utils.empty(input.startDate)) {
+        if (!utils.empty(input.eventStartDate)) {
           // eventData.startDate = input.startDate;
-          eventData.startDate = input.eventDate;
+          eventData.startDate = input.eventStartDate;
         }
-        if (!utils.empty(input.endDate)) {
-          eventData.endDate = input.endDate;
+        if (!utils.empty(input.eventEndDate)) {
+          eventData.endDate = input.eventEndDate;
         }
         if (!utils.empty(input.eventFee)) {
           eventData.eventFee = input.eventFee;

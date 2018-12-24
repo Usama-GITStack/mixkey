@@ -1273,8 +1273,8 @@ userCtr.listWhishlist = (req, res) => {
                 data: listRecord,
                 status: true,
                 message: "",
-                eventImageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/event/",
-                placeImageurlPath: "https://s3.ap-south-1.amazonaws.com/multikeybucket/place/",
+                eventImageurlPath: config.eventURL,
+                placeImageurlPath: config.placeURL,
             });
         } else {
             res.status(400).json({
