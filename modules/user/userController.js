@@ -809,7 +809,7 @@ userCtr.getContactUserList = (req, res) => {
                 "message": { "$first": "$message" },
                 "from": { "$first": "$from" },
                 "createdAt": { "$first": "$createdAt" },
-                "count": { "$sum": { "$cond": { if: { $eq: ["$read", 1], $eq: ["$to", userId] }, then: 1, else: 0 } } },
+                "count": { "$sum": { "$cond": { if: { $eq: ["$read", 1], $eq: ["$to", ObjectId(userId)] }, then: 1, else: 0 } } },
             }
         },
         {
