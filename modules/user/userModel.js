@@ -188,6 +188,7 @@ userSchema.statics.getNearby = function(input, callback) {
         return miles / earthRadiusInMiles;
     };
     let query = {};
+    query.status = 'ACTIVE';
     query.loc = {
         $geoWithin: {
             $centerSphere: [
