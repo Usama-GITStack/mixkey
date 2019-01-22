@@ -1394,11 +1394,11 @@ userCtr.nearby = (req, res) => {
                     }
                 });
             } else if (input.listType === "place") {
-                placeModel.getNearby(input, (err, eventList) => {
+                placeModel.getNearby(input, (err, placeList) => {
                     if (!!err) {
                         callback(err);
                     } else {
-                        callback(null, { places: eventList });
+                        callback(null, { places: placeList });
                     }
                 });
             } else {
