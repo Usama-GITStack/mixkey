@@ -720,7 +720,7 @@ userCtr.getMessages = (req, res) => {
                 "message": req.t("DB_ERROR")
             });
         } else if (total > 0) {
-            messageModel.update({ from: userId, to: input.userId }, { read: 0 }, { multi: true }, (er, details) => {});
+            // messageModel.update({ from: userId, to: input.userId }, { read: 0 }, { multi: true }, (er, details) => {});
             messageModel.update({ from: input.userId, to: userId }, { read: 0 }, { multi: true }, (er, details) => {});
 
             let pages = Math.ceil(total / limit);
@@ -809,7 +809,7 @@ userCtr.getContactUserList = (req, res) => {
                 "message": { "$first": "$message" },
                 "from": { "$first": "$from" },
                 "createdAt": { "$first": "$createdAt" },
-                "count": { "$sum": { "$cond": { if: { $eq: ["$read", 1], $eq: ["$to", ObjectId(userId)] }, then: 1, else: 0 } } },
+                "count": { "$sum": { "$cond": { if: { $and: [{$eq: ["$read", 1]}, {$eq: ["$to", ObjectId(userId)]}] }, then: 1, else: 0 } } },
             }
         },
         {
