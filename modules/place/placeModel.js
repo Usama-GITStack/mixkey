@@ -27,6 +27,17 @@ let placeSchema = new schema({
         type: String,
         required: false
     },
+    locations: [
+        {
+            location: String,
+            loc: {
+                type: {
+                    type: String
+                },
+                coordinates: [Number]
+            },
+        }
+    ],
     languages: [{
         language: {
             type: String
@@ -59,20 +70,39 @@ placeSchema.index({
 });
 
 
+
 placeSchema.statics.getNearby = function(input, callback) {
     let milesToRadian = function(km) {
         let miles = km * 0.621371;
         var earthRadiusInMiles = 3963.2;
         return miles / earthRadiusInMiles;
     };
-    let query = {};
-    query.loc = {
-        $geoWithin: {
-            $centerSphere: [
-                [input.longitude, input.latitude], milesToRadian(input.distance)
-            ]
-        }
+    let arePointsNear = function(checkPoint, centerPoint, km) {
+        let ky = 40000 / 360;
+        let kx = Math.cos(Math.PI * centerPoint.lat / 180.0) * ky;
+        let dx = Math.abs(centerPoint.lng - checkPoint.lng) * kx;
+        let dy = Math.abs(centerPoint.lat - checkPoint.lat) * ky;
+        return Math.sqrt(dx * dx + dy * dy) <= km;
     }
+    let query = {};
+    // query.loc = {
+    //     $geoWithin: {
+    //         $centerSphere: [
+    //             [input.longitude, input.latitude], milesToRadian(input.distance)
+    //         ]
+    //     }
+    // }
+    query.locations = {
+        $elemMatch: {
+            "loc": {
+                $geoWithin: {
+                    $centerSphere: [
+                        [input.longitude, input.latitude], milesToRadian(input.distance)
+                    ]
+                }
+            }
+        }
+    };
     if (!utils.empty(input.languages) && input.languages.length > 0 && typeof input.languages === 'object') {
         query["languages.language"] = {
             "$in": input.languages
@@ -81,10 +111,10 @@ placeSchema.statics.getNearby = function(input, callback) {
     this.find(query).exec((err, resultObj) => {
         let idobject = resultObj.map(obj => obj._id);
         this.aggregate([{
-                "$match": {
-                    "_id": { "$in": idobject }
-                }
-            },
+            "$match": {
+                "_id": { "$in": idobject }
+            }
+        },
             {
                 "$lookup": {
                     "from": "wishlists",
@@ -93,7 +123,35 @@ placeSchema.statics.getNearby = function(input, callback) {
                     "as": "wishlist"
                 }
             }
-        ], callback);
+        ], (err, result) => {
+            if(!!err){
+                callback(err, result);
+            } else {
+                let placeList = [];
+                result.forEach((place, i) => {
+                    let findIndex = -1;
+                    for(let j = 0; j < resultObj.length; j++) {
+                        if(resultObj[j]._id.toString() === place._id.toString()){
+                            findIndex = j;
+                            break;
+                        }
+                    }
+                    if(findIndex !== -1) {
+                        resultObj[findIndex].locations.forEach((location) => {
+                            if(arePointsNear({lng: location.loc.coordinates[0], lat:location.loc.coordinates[1]}, {lng: input.longitude, lat: input.latitude}, input.distance)) {
+                                let newPlace = {
+                                    ...place,
+                                    location: location.location,
+                                    loc: location.loc
+                                };
+                                placeList.push(newPlace);
+                            }
+                        });
+                    }
+                });
+                callback(err, placeList);
+            }
+        });
     });
 };
 
@@ -148,6 +206,7 @@ placeSchema.statics.placeList = function(filter, pg, limit, loginUserId, select 
             "languages": 1,
             "location": 1,
             "loc": 1,
+            "locations": 1,
             "status": 1,
             "image": 1,
             "createdAt": 1,

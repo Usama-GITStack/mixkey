@@ -156,7 +156,8 @@ eventCtr.getActiveEventList = (req, res) => {
   let input = req.body;
   let loginUserId = req.authUser._id;
   let currentDate = new Date();
-  let filter = { startDate: { $lt: currentDate }, endDate: { $gt: currentDate } };
+  // let filter = { startDate: { $lt: currentDate }, endDate: { $gt: currentDate } };
+  let filter = { endDate: { $gt: currentDate } };
   filter.status = 'ACTIVE';
   if (!utils.empty(input.title)) {
     filter.title = {

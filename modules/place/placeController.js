@@ -36,10 +36,10 @@ placeCtr.createPlace = (req, res) => {
                     placeName: input.placeName.toLowerCase(),
                     placeTitle: input.placeTitle,
                     description: input.description,
-                    location: input.location,
+                    location: 'aaaa', //input.location,
                     loc: {
                         type: "Point",
-                        coordinates: [input.longitude, input.latitude]
+                        coordinates:  [1.0, 1.0] //[input.longitude, input.latitude]
                     },
                     status: "ACTIVE",
                     createdAt: new Date(),
@@ -49,6 +49,15 @@ placeCtr.createPlace = (req, res) => {
                 if (!utils.empty(image)) {
                     placeData.image = image;
                 }
+                let locationArr = [];
+                if (!!input.locations && input.locations.length > 0 && typeof input.locations === 'object') {
+                    input.locations.map((v) => {
+                        let obj = JSON.parse(v);
+                        locationArr.push({ location: obj.location, loc: {type: 'Point', coordinates: [obj.longitude, obj.latitude]} });
+                    });
+                }
+                placeData.locations = locationArr;
+
                 let languageArr = [];
                 if (!!input.languages && input.languages.length > 0 && typeof input.languages === 'object') {
                     input.languages.map((obj) => {
@@ -139,7 +148,7 @@ placeCtr.getPlaceList = (req, res) => {
             });
         }
     });
-}
+};
 
 placeCtr.setWishlistFlag = (places, loginUserId) => {
     let temp;
@@ -195,21 +204,31 @@ placeCtr.updatePlace = (req, res) => {
             if (!utils.empty(input.description)) {
                 placeData.description = input.description;
             }
-            if (!utils.empty(input.location)) {
-                placeData.location = input.location;
-            }
-            if (!utils.empty(input.latitude) && !utils.empty(input.longitude)) {
-                placeData.loc = {
-                    type: "Point",
-                    coordinates: [input.longitude, input.latitude]
-                }
-            }
+            // if (!utils.empty(input.location)) {
+            //     placeData.location = input.location;
+            // }
+            // if (!utils.empty(input.latitude) && !utils.empty(input.longitude)) {
+            //     placeData.loc = {
+            //         type: "Point",
+            //         coordinates: [input.longitude, input.latitude]
+            //     }
+            // }
             if (!utils.empty(input.status)) {
                 placeData.status = input.status;
             }
             if (!utils.empty(image)) {
                 placeData.image = image;
             }
+
+            let locationArr = [];
+            if (!!input.locations && input.locations.length > 0 && typeof input.locations === 'object') {
+                input.locations.map((v) => {
+                    let obj = JSON.parse(v);
+                    locationArr.push({ location: obj.location, loc: {type: 'Point', coordinates: [obj.longitude, obj.latitude]} });
+                });
+            }
+            placeData.locations = locationArr;
+
             let languageArr = [];
             if (!!input.languages && input.languages.length > 0 && typeof input.languages === 'object') {
                 input.languages.map((obj) => {
