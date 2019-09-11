@@ -90,7 +90,7 @@ eventSchema.statics.getNearby = function(input, callback) {
     let milesToRadian = function(km) {
         let miles = km * 0.621371;
         var earthRadiusInMiles = 3963.2;
-        return miles / earthRadiusInMiles;
+        return earthRadiusInMiles;
     };
     let query = {};
     query.loc = {
@@ -100,11 +100,11 @@ eventSchema.statics.getNearby = function(input, callback) {
             ]
         }
     }
-    if (!utils.empty(input.learningLanguage) && input.learningLanguage.length > 0 && typeof input.learningLanguage === 'object') {
-        query["learningLanguage.language"] = {
-            "$in": input.learningLanguage
-        };
-    }
+    // if (!utils.empty(input.learningLanguage) && input.learningLanguage.length > 0 && typeof input.learningLanguage === 'object') {
+    //     query["learningLanguage.language"] = {
+    //         "$in": input.learningLanguage
+    //     };
+    // }
     this.find(query).exec((err, resultObj) => {
         let idobject = resultObj.map(obj => obj._id);
         this.aggregate([{

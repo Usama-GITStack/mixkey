@@ -364,7 +364,9 @@ userCtr.createUser = (req, res) => {
 }
 
 userCtr.getUserList = (req, res) => {
+    console.log("get user list...");
     let input = req.body;
+    console.log(input);
     let userId = req.authUser._id;
     let filter = {};
     filter.userRole = 2;
@@ -372,12 +374,19 @@ userCtr.getUserList = (req, res) => {
         filter.status = "ACTIVE";
     }
     filter._id = { "$ne": userId };
-    if (!utils.empty(input.practiceLanguage)) {
-        // filter.practiceLanguage = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
-        filter["practiceLanguage.language"] = input.practiceLanguage;
+    if (!utils.empty(input.practiceLanguage) && input.practiceLanguage!= 'Empty') {
+        filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
+        // filter["practiceLanguage.language"] = input.practiceLanguage;
     }
-    if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && typeof input.nativeLanguage === 'object') {
-        filter.nativeLanguage = { "$in": input.nativeLanguage };
+    if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && typeof input.nativeLanguage === 'object' && input.nativeLanguage!= 'Empty') {
+        filter.nativeLanguage = {$regex: new RegExp('^' + input.nativeLanguage,'i')};
+        // filter.nativeLanguage = { "$in": input.nativeLanguage };
+    }
+    if(!utils.empty(input.searchText) && input.searchText != '')
+    {
+        filter.userName = {$regex: new RegExp('^' + input.searchText,'i')};
+        // filter.userName = {"$in":input.searchText};
+        //filter.userName = input.searchText;
     }
     if (!utils.empty(input.nativeLangCode)) {
         filter.nativeLangCode = input.nativeLangCode;
@@ -412,21 +421,24 @@ userCtr.getUserList = (req, res) => {
     }
     let select = userCtr.getFields('login');
     userModel.getUserList(filter, pg, limit, select, (err, total, users) => {
+        // console.log('main user', users);
         if (!!err) {
+            console.log(err);
             res.status(500).json({
                 data: [],
                 status: false,
                 "message": req.t("DB_ERROR")
             });
         } else if (total > 0) {
+            console.log(total);
             let pages = Math.ceil(total / limit);
             let newUsers = users.map( (obj) => {
                 obj.imageURL = config.userURL;
                 return obj;
             });
-            console.log("<<<<>>>>>>>")
-            console.log(newUsers)
-            console.log("<<<<>>>>>>>")
+            console.log("<<<<>>>>>>>");
+            console.log(newUsers);
+            console.log("<<<<>>>>>>>");
             let pagination = {
                 pages: pages ? pages : 1,
                 total: total,
@@ -450,7 +462,9 @@ userCtr.getUserList = (req, res) => {
 }
 
 userCtr.updateUser = (req, res) => {
+    console.log("update call....");
     let input = req.body;
+    console.log(input);
     let userId = req.authUser._id;
     if (!utils.empty(input.userId) && ObjectId.isValid(input.userId)) {
         userId = input.userId;
@@ -693,6 +707,7 @@ userCtr.updateMessagesId = (id, loginUserId, otherUserId) => {
 }
 
 userCtr.getMessages = (req, res) => {
+    console.log("Message user");
     let input = req.body;
     let userId = req.authUser._id;
     let filter = {
@@ -791,7 +806,9 @@ userCtr.forgotPassword = (req, res) => {
 };
 
 userCtr.getContactUserList = (req, res) => {
+    console.log("Contact user");
     let input = req.body;
+    console.log(input);
     let userId = req.authUser._id;
     let filter = [{
             "$match": {
@@ -846,11 +863,15 @@ userCtr.getContactUserList = (req, res) => {
                 "from.email": 1,
                 "from.userName": 1,
                 "from.profilePic": 1,
+                "from.practiceLanguage":1,
+                "from.nativeLanguage":1,
                 "to._id": 1,
                 "to.fullName": 1,
                 "to.email": 1,
                 "to.userName": 1,
-                "to.profilePic": 1
+                "to.profilePic": 1,
+                "to.practiceLanguage":1,
+                "to.nativeLanguage":1,
             }
         },
     ];
@@ -881,6 +902,7 @@ userCtr.getContactUserList = (req, res) => {
                 max: limit
             };
             userList.reverse();
+            console.log(userList);
             res.status(200).json({
                 pagination: pagination,
                 data: userList,
@@ -1381,6 +1403,7 @@ userCtr.updatelocation = (req, res) => {
 
 userCtr.nearby = (req, res) => {
     let input = req.body;
+    console.log(input);
     let loginUserId = req.authUser._id;
     let filter = {};
     waterfall([
@@ -1390,6 +1413,7 @@ userCtr.nearby = (req, res) => {
                     if (!!err) {
                         callback(err);
                     } else {
+                        console.log(eventList);
                         callback(null, { events: eventList });
                     }
                 });
@@ -1398,6 +1422,7 @@ userCtr.nearby = (req, res) => {
                     if (!!err) {
                         callback(err);
                     } else {
+                        console.log(placeList);
                         callback(null, { places: placeList });
                     }
                 });
@@ -1406,6 +1431,7 @@ userCtr.nearby = (req, res) => {
                     if (!!err) {
                         callback(err);
                     } else {
+                        console.log(eventList);
                         callback(null, { user: eventList });
                     }
                 });

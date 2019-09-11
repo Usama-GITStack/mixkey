@@ -75,7 +75,7 @@ placeSchema.statics.getNearby = function(input, callback) {
     let milesToRadian = function(km) {
         let miles = km * 0.621371;
         var earthRadiusInMiles = 3963.2;
-        return miles / earthRadiusInMiles;
+        return earthRadiusInMiles;
     };
     let arePointsNear = function(checkPoint, centerPoint, km) {
         let ky = 40000 / 360;
@@ -103,11 +103,11 @@ placeSchema.statics.getNearby = function(input, callback) {
             }
         }
     };
-    if (!utils.empty(input.languages) && input.languages.length > 0 && typeof input.languages === 'object') {
-        query["languages.language"] = {
-            "$in": input.languages
-        };
-    }
+    // if (!utils.empty(input.languages) && input.languages.length > 0 && typeof input.languages === 'object') {
+    //     query["languages.language"] = {
+    //         "$in": input.languages
+    //     };
+    // }
     this.find(query).exec((err, resultObj) => {
         let idobject = resultObj.map(obj => obj._id);
         this.aggregate([{

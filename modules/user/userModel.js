@@ -67,6 +67,9 @@ let userSchema = new schema({
     practiceLanguage: [{
         language: {
             type: String
+        },
+        level:{
+            type:String
         }
     }],
     nativeLanguage: {
@@ -182,10 +185,11 @@ userSchema.virtual('userId').get(function() {
 
 
 userSchema.statics.getNearby = function(input, callback) {
+    console.log(input);
     let milesToRadian = function(km) {
         let miles = km * 0.621371;
         var earthRadiusInMiles = 3963.2;
-        return miles / earthRadiusInMiles;
+        return earthRadiusInMiles;
     };
     let query = {};
     query.status = 'ACTIVE';
@@ -193,23 +197,31 @@ userSchema.statics.getNearby = function(input, callback) {
         $geoWithin: {
             $centerSphere: [
                 [input.longitude, input.latitude], milesToRadian(input.distance)
+                
             ]
         }
     }
     if (!utils.empty(input.practiceLanguage) && input.practiceLanguage.length > 0 && typeof input.practiceLanguage === 'object') {
-        query["practiceLanguage.language"] = {
-            "$in": input.practiceLanguage
-        };
+        console.log("native filter");
+        // query["practiceLanguage.language"] = {
+        //     "$in": input.practiceLanguage
+        // };
+        query["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
+        
     }
-    if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && typeof input.nativeLanguage === 'object') {
-        query.nativeLanguage = {
-            "$in": input.nativeLanguage
-        };
+    if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0) {
+        
+        // query.nativeLanguage = {
+        //     "$in": input.nativeLanguage
+        // };
+        query.nativeLanguage = { $regex: new RegExp('^' + input.nativeLanguage, 'i') };
     }
     this.find(query).exec(callback);
 };
 
 userSchema.statics.getUserList = function(filter, pg, limit, select = {}, callback) {
+    //console.log("getUserList inside....");
+
     if (typeof select === 'function' && !callback) {
         callback = select;
         select = {};
@@ -221,8 +233,10 @@ userSchema.statics.getUserList = function(filter, pg, limit, select = {}, callba
             skip: pg
         };
     }
+    
     this.count(filter).exec((err, total) => {
         this.find(filter, select, paging).exec(function(err, result) {
+            
             callback(err, total, result);
         });
     });
