@@ -379,7 +379,16 @@ userCtr.getUserList = (req, res) => {
         // filter["practiceLanguage.language"] = input.practiceLanguage;
     }
     if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && typeof input.nativeLanguage === 'object' && input.nativeLanguage!= 'Empty') {
-        filter.nativeLanguage = {$regex: new RegExp('^' + input.nativeLanguage,'i')};
+        
+        if(input.nativeLanguage.length>1)
+        { 
+            filter.nativeLanguage = { "$in": input.nativeLanguage };
+        }
+        else
+        {
+            filter.nativeLanguage = {$regex: new RegExp('^' + input.nativeLanguage,'i')};
+        }
+        
         // filter.nativeLanguage = { "$in": input.nativeLanguage };
     }
     if(!utils.empty(input.searchText) && input.searchText != '')
