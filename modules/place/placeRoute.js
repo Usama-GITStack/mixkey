@@ -146,4 +146,7 @@ let deletePlacesMiddleware = [
 ];
 placeRouter.post('/deletePlace', deletePlacesMiddleware);
 
+
+placeRouter.post('/placeById',placeCtr.getPlaceById);
+
 module.exports = placeRouter;

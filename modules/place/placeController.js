@@ -7,6 +7,45 @@ const reviewModel = require('../user/reviewModel');
 
 let placeCtr = {};
 
+placeCtr.getFields = (type) => {
+    let common = [
+        "_id",
+        "placeName",
+        "placeTitle",
+        "description",
+        "image",
+        "location",
+        "locations",
+        "languages",
+        "loc",
+        "status"
+    ];
+    return common;
+  };
+  
+
+  placeCtr.getPlaceById = (req,res) => {
+    
+    console.log(req.body);
+      let placeId;
+      if (req.body.placeId) {
+        placeId = req.body.placeId;
+      }
+      let select = placeCtr.getFields();
+      placeModel.load(placeId, select,(err, placeDetail) => {
+          if (!!err) {
+              return res.status(500).json({
+                  data: [],
+                  status: false,
+                  "message": req.t("DB_ERROR")
+              });
+          } else {
+              return res.status(200).json(placeDetail);
+          }
+      });
+  }
+
+
 placeCtr.createPlace = (req, res) => {
     let input = req.body;
     waterfall([

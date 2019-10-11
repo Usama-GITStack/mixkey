@@ -202,10 +202,9 @@ userSchema.statics.getNearby = function(input, callback) {
         }
     }
     if (!utils.empty(input.practiceLanguage) && input.practiceLanguage.length > 0 && typeof input.practiceLanguage === 'object') {
-        console.log("native filter");
-        // query["practiceLanguage.language"] = {
-        //     "$in": input.practiceLanguage
-        // };
+        console.log("practice filter"); 
+        // query["practiceLanguage.language"] = { "$in": input.practiceLanguage};
+        
         query["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
         
     }
