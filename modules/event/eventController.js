@@ -10,6 +10,25 @@ const reviewModel = require('../user/reviewModel');
 
 let eventCtr = {};
 
+eventCtr.getFields = (type) => {
+  let common = [
+      "_id",
+      "title",
+      "description",
+      "image",
+      "startDate",
+      "endDate",
+      "eventFee",
+      "location",
+      "loc",
+      "learningLanguage",
+      "status"
+  ];
+  return common;
+};
+
+
+
 eventCtr.createEvent = (req, res) => {
   let input = req.body;
   waterfall(
@@ -96,6 +115,8 @@ eventCtr.createEvent = (req, res) => {
 };
 
 eventCtr.getEventList = (req, res) => {
+
+  
   let input = req.body;
   let loginUserId = req.authUser._id;
   let filter = {};
@@ -151,6 +172,27 @@ eventCtr.getEventList = (req, res) => {
     }
   });
 };
+
+eventCtr.getEventById = (req,res) => {
+  console.log("Hittingg!!!");
+  console.log(req.body);
+    let eventId;
+    if (req.body.eventId) {
+      eventId = req.body.eventId;
+    }
+    let select = eventCtr.getFields();
+    eventModel.load(eventId, select,(err, eventDetail) => {
+        if (!!err) {
+            return res.status(500).json({
+                data: [],
+                status: false,
+                "message": req.t("DB_ERROR")
+            });
+        } else {
+            return res.status(200).json(eventDetail);
+        }
+    });
+}
 
 eventCtr.getActiveEventList = (req, res) => {
   let input = req.body;

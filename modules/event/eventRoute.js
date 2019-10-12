@@ -138,4 +138,6 @@ eventRouter.post('/activeEventList', geteventsActiveMiddleware);
 let deleteEventMiddleware = [multipartMiddleware, auth.isAuthenticatedUser, eventMiddleware.validateId, eventCtr.deleteEvent];
 eventRouter.post('/deleteEvent', deleteEventMiddleware);
 
+eventRouter.post('/eventById',eventCtr.getEventById);
+
 module.exports = eventRouter;
