@@ -31,18 +31,65 @@ placeCtr.getFields = (type) => {
       if (req.body.placeId) {
         placeId = req.body.placeId;
       }
+      let loginUserId = req.body.authId;
       let select = placeCtr.getFields();
-      placeModel.load(placeId, select,(err, placeDetail) => {
-          if (!!err) {
-              return res.status(500).json({
-                  data: [],
-                  status: false,
-                  "message": req.t("DB_ERROR")
-              });
-          } else {
-              return res.status(200).json(placeDetail);
-          }
-      });
+      let filter = {};
+      filter.status = 'ACTIVE';
+      placeModel.placeList(filter, 0, null, loginUserId, (err, total, places) => {
+        //   console.log(places);
+        if (!!err) {
+            res.status(500).json({
+                data: [],
+                status: false,
+                "message": req.t("DB_ERROR")
+            });
+        } else if (total > 0) {
+            
+            places.map(obj => {
+                if(obj._id == placeId){
+                  
+                  temp = 0;
+                  if (!!obj.wishlist && obj.wishlist.length > 0) {
+                      obj.wishlist.map(item => {
+                        
+                        if (item.eventPlaceType === 'place' && item.placeId.toString() === obj._id.toString() && item.userId.toString() === loginUserId.toString()) {
+                          
+                          temp = 1;
+                        }
+                        console.log(item);
+                        // console.log(obj);
+                      });
+                  }
+                  
+                  obj['placeFlag'] = temp == 1 ? 1 : 0;
+                  obj['imageURL'] = config.eventURL;
+                  delete obj.wishlist;
+                  
+                  return res.status(200).json(obj);
+                }
+            });    
+        } else {
+            res.status(400).json({
+                data: [],
+                status: true,
+                "message": req.t("NO_RECORD_FOUND")
+            });
+        }
+    });
+
+
+
+    //   placeModel.load(placeId, select,(err, placeDetail) => {
+    //       if (!!err) {
+    //           return res.status(500).json({
+    //               data: [],
+    //               status: false,
+    //               "message": req.t("DB_ERROR")
+    //           });
+    //       } else {
+    //           return res.status(200).json(placeDetail);
+    //       }
+    //   });
   }
 
 

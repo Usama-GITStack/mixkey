@@ -22,7 +22,8 @@ eventCtr.getFields = (type) => {
       "location",
       "loc",
       "learningLanguage",
-      "status"
+      "status",
+      "wishlist"
   ];
   return common;
 };
@@ -176,22 +177,93 @@ eventCtr.getEventList = (req, res) => {
 eventCtr.getEventById = (req,res) => {
   console.log("Hittingg!!!");
   console.log(req.body);
+    let temp;
+    let loginUserId = req.body.authId;
+    let currentDate = new Date();
     let eventId;
     if (req.body.eventId) {
       eventId = req.body.eventId;
     }
     let select = eventCtr.getFields();
-    eventModel.load(eventId, select,(err, eventDetail) => {
-        if (!!err) {
-            return res.status(500).json({
-                data: [],
-                status: false,
-                "message": req.t("DB_ERROR")
-            });
-        } else {
-            return res.status(200).json(eventDetail);
-        }
+    let filter = {};
+    filter.status = 'ACTIVE';
+    console.log(loginUserId);
+    eventModel.eventList(filter,0,null ,loginUserId, (err, total, events) => {
+
+      if (!!err) {
+        console.log("error");
+        res.status(500).json({
+          data: [],
+          status: false,
+          message: req.t('DB_ERROR'),
+        });
+      } else if (total > 0) {
+
+        events.map(obj => {
+            if(obj._id == eventId){
+              
+              temp = 0;
+              if (!!obj.wishlist && obj.wishlist.length > 0) {
+                  obj.wishlist.map(item => {
+                    
+                    if (item.eventPlaceType === 'event' && item.eventId.toString() === obj._id.toString() && item.userId.toString() === loginUserId.toString()) {
+                      
+                      temp = 1;
+                    }
+                    // console.log(obj);
+                  });
+              }
+              
+              obj['eventFlag'] = temp == 1 ? 1 : 0;
+              obj['imageURL'] = config.eventURL;
+              delete obj.wishlist;
+              
+              return res.status(200).json(obj);
+            }
+        });
+        
+        // res.status(200).json({
+        //   pagination: pagination,
+        //   data: eventCtr.setWishlistFlag(events, loginUserId),
+        //   status: true,
+        //   imageurlPath: config.eventURL,
+        //   message: '',
+        // });
+      } else {
+        console.log("no result");
+        res.status(400).json({
+          data: [],
+          status: true,
+          message: req.t('NO_RECORD_FOUND'),
+        });
+      }
     });
+
+
+
+    // eventModel.load(eventId, select,(err, eventDetail) => {
+    //     if (!!err) {
+    //         return res.status(500).json({
+    //             data: [],
+    //             status: false,
+    //             "message": req.t("DB_ERROR")
+    //         });
+    //     } else {
+    //       console.log(eventDetail);
+    //           temp = 0;
+    //           if (!!eventDetail.wishlist && eventDetail.wishlist.length > 0) {
+    //             eventDetail.wishlist.map(item => {
+    //           if (item.eventPlaceType === 'event' && item.eventId.toString() == eventDetail._id.toString() && item.userId.toString() == loginUserId.toString()) {
+    //              temp = 1;
+    //           }
+    //           });
+    //           }
+    //           eventDetail['eventFlag'] = temp == 1 ? 1 : 0;
+    //           eventDetail['imageURL'] = config.eventURL;
+    //           delete eventDetail.wishlist;
+    //         return res.status(200).json(eventDetail);
+    //     }
+    // });
 }
 
 eventCtr.getActiveEventList = (req, res) => {
@@ -255,6 +327,7 @@ eventCtr.getActiveEventList = (req, res) => {
 
 eventCtr.setWishlistFlag = (places, loginUserId) => {
   let temp;
+  console.log(places);
   places.map(obj => {
     temp = 0;
     if (!!obj.wishlist && obj.wishlist.length > 0) {
@@ -268,6 +341,7 @@ eventCtr.setWishlistFlag = (places, loginUserId) => {
     obj['imageURL'] = config.eventURL;
     delete obj.wishlist;
   });
+  
   return places;
 };
 
