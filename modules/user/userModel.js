@@ -191,7 +191,7 @@ userSchema.statics.getNearby = function(input, callback) {
         var earthRadiusInMiles = 3963.2;
         return earthRadiusInMiles;
     };
-    let query = {};
+    let query = {status : 'ACTIVE',$or:[{nativeLanguage:{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.practiceLanguage, 'i') }}]};
     query.status = 'ACTIVE';
     query.loc = {
         $geoWithin: {
@@ -201,26 +201,26 @@ userSchema.statics.getNearby = function(input, callback) {
             ]
         }
     }
-    if (!utils.empty(input.practiceLanguage) && input.practiceLanguage.length > 0 && typeof input.practiceLanguage === 'object') {
-        console.log("practice filter"); 
-        // query["practiceLanguage.language"] = { "$in": input.practiceLanguage};
+    console.log(query);
+    // if (!utils.empty(input.practiceLanguage) && input.practiceLanguage.length > 0 && typeof input.practiceLanguage === 'object') {
+    //     console.log("practice filter"); 
+    //     // query["practiceLanguage.language"] = { "$in": input.practiceLanguage};
         
-        query["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
+    //     query["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
         
-    }
-    if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0) {
+    // }
+    // if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0) {
         
-        // query.nativeLanguage = {
-        //     "$in": input.nativeLanguage
-        // };
-        query.nativeLanguage = { $regex: new RegExp('^' + input.nativeLanguage, 'i') };
-    }
+    //     // query.nativeLanguage = {
+    //     //     "$in": input.nativeLanguage
+    //     // };
+    //     query.nativeLanguage = { $regex: new RegExp('^' + input.nativeLanguage, 'i') };
+    // }
     this.find(query).exec(callback);
 };
 
 userSchema.statics.getUserList = function(filter, pg, limit, select = {}, callback) {
-    //console.log("getUserList inside....");
-
+   
     if (typeof select === 'function' && !callback) {
         callback = select;
         select = {};

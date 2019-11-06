@@ -111,7 +111,6 @@ userCtr.login = (req, res) => {
 
                     user.lastLogin = Date.now();
                     user.isActive = true;
-                    console.log(user)
                     user.save((err) => {
                         console.log(err, 'update lastlogin')
                     });
@@ -368,41 +367,47 @@ userCtr.getUserList = (req, res) => {
     let input = req.body;
     console.log(input);
     let userId = req.authUser._id;
-    let filter = {};
-    filter.userRole = 2;
-    if (!utils.empty(req.authUser) && req.authUser.userRole === 2) {
-        filter.status = "ACTIVE";
-    }
-    filter._id = { "$ne": userId };
-    if (!utils.empty(input.practiceLanguage) && input.practiceLanguage!= 'Empty') {
-        filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
-        // filter["practiceLanguage.language"] = input.practiceLanguage;
-    }
-    if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && typeof input.nativeLanguage === 'object' && input.nativeLanguage!= 'Empty') {
+    let filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},$or: [{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }},{userName:{$regex: new RegExp('^' + input.searchText,'i')}}]};
+    // filter.userRole = 2;
+    // if (!utils.empty(req.authUser) && req.authUser.userRole === 2) {
+    //     filter.status = "ACTIVE";
+    // }
+    // filter._id = { "$ne": userId };
+    // if (!utils.empty(input.practiceLanguage) && input.practiceLanguage!= 'Empty') {
+    //     filter.nativeLanguage = { "$in": input.practiceLanguage };
+    //     // filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
+    //     // filter["practiceLanguage.language"] = input.practiceLanguage;
+    // }
+    // if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && input.nativeLanguage!= 'Empty') {
         
-        if(input.nativeLanguage.length>1)
-        { 
-            filter.nativeLanguage = { "$in": input.nativeLanguage };
-        }
-        else
-        {
-            filter.nativeLanguage = {$regex: new RegExp('^' + input.nativeLanguage,'i')};
-        }
+
+    //     // filter["practiceLanguage.language"] = {"$in":input.nativeLanguage};
+    //     //console.log(filter["praticeLanguage.language"]);
+    //     if(input.nativeLanguage.length>1)
+    //     { 
+    //         filter["practiceLanguage.language"] = {"$in":input.nativeLanguage};
+    //         // filter.nativeLanguage = { "$in": input.nativeLanguage };
+    //     }
+    //     else
+    //     {
+    //         filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.nativeLanguage, 'i') };
+    //         // filter.nativeLanguage = {$regex: new RegExp('^' + input.nativeLanguage,'i')};
+    //     }
         
-        // filter.nativeLanguage = { "$in": input.nativeLanguage };
-    }
-    if(!utils.empty(input.searchText) && input.searchText != '')
-    {
-        filter.userName = {$regex: new RegExp('^' + input.searchText,'i')};
-        // filter.userName = {"$in":input.searchText};
-        //filter.userName = input.searchText;
-    }
-    if (!utils.empty(input.nativeLangCode)) {
-        filter.nativeLangCode = input.nativeLangCode;
-    }
-    if (!utils.empty(input.praticeLangCode)) {
-        filter.praticeLangCode = input.praticeLangCode;
-    }
+    //     // filter.nativeLanguage = { "$in": input.nativeLanguage };
+    // }
+    // if(!utils.empty(input.searchText) && input.searchText != '')    
+    // {
+    //     // filter.userName = {$regex: new RegExp('^' + input.searchText,'i')};
+    //     // filter.userName = {"$in":input.searchText};
+    //     //filter.userName = input.searchText;
+    // }
+    // if (!utils.empty(input.nativeLangCode)) {
+    //     filter.nativeLangCode = input.nativeLangCode;
+    // }
+    // if (!utils.empty(input.praticeLangCode)) {
+    //     filter.praticeLangCode = input.praticeLangCode;
+    // }
     if (!utils.empty(input.ageMin) && !utils.empty(input.ageMax)) {
         filter.age = {
             '$gte': input.ageMin,
@@ -429,25 +434,21 @@ userCtr.getUserList = (req, res) => {
         filter.fullName = new RegExp(input.searchName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i");
     }
     let select = userCtr.getFields('login');
+    console.log(filter);
     userModel.getUserList(filter, pg, limit, select, (err, total, users) => {
         // console.log('main user', users);
         if (!!err) {
-            console.log(err);
             res.status(500).json({
                 data: [],
                 status: false,
                 "message": req.t("DB_ERROR")
             });
         } else if (total > 0) {
-            console.log(total);
             let pages = Math.ceil(total / limit);
             let newUsers = users.map( (obj) => {
                 obj.imageURL = config.userURL;
                 return obj;
             });
-            console.log("<<<<>>>>>>>");
-            console.log(newUsers);
-            console.log("<<<<>>>>>>>");
             let pagination = {
                 pages: pages ? pages : 1,
                 total: total,
@@ -471,9 +472,7 @@ userCtr.getUserList = (req, res) => {
 }
 
 userCtr.updateUser = (req, res) => {
-    console.log("update call....");
     let input = req.body;
-    console.log(input);
     let userId = req.authUser._id;
     if (!utils.empty(input.userId) && ObjectId.isValid(input.userId)) {
         userId = input.userId;
@@ -482,7 +481,6 @@ userCtr.updateUser = (req, res) => {
         (callback) => {
             userModel.getUserById(userId, (err, oldUserData) => {
                 if (!!err) {
-                    console.log(err);
                     callback(err);
                 } else {
                     callback(null, oldUserData);
@@ -716,7 +714,6 @@ userCtr.updateMessagesId = (id, loginUserId, otherUserId) => {
 }
 
 userCtr.getMessages = (req, res) => {
-    console.log("Message user");
     let input = req.body;
     let userId = req.authUser._id;
     let filter = {
@@ -815,9 +812,7 @@ userCtr.forgotPassword = (req, res) => {
 };
 
 userCtr.getContactUserList = (req, res) => {
-    console.log("Contact user");
     let input = req.body;
-    console.log(input);
     let userId = req.authUser._id;
     let filter = [{
             "$match": {
@@ -911,7 +906,6 @@ userCtr.getContactUserList = (req, res) => {
                 max: limit
             };
             userList.reverse();
-            console.log(userList);
             res.status(200).json({
                 pagination: pagination,
                 data: userList,
@@ -950,7 +944,6 @@ userCtr.setPassword = (req, res) => {
                 "message": req.t("PASSWORD_SET")
             });
         }, (err) => {
-            console.log(err);
             return res.status(500).json({
                 "message": req.t("DB_ERROR")
             });
@@ -970,7 +963,6 @@ userCtr.statusChange = (req, res) => {
             _id: input.userId
         }, updateData, (err, userDetail) => {
             if (!!err) {
-                console.log(err);
                 return res.status(500).json({
                     data: [],
                     status: false,
@@ -1017,7 +1009,6 @@ userCtr.verify = (req, res) => {
                         "message": req.t("EMAIL_VERIFY")
                     });
                 }, (err) => {
-                    console.log(err);
                     return res.status(500).json({
                         "message": req.t("DB_ERROR")
                     });
@@ -1051,7 +1042,6 @@ userCtr.resetPassword = (req, res) => {
                     "message": req.t("PASSWORD_SET")
                 });
             }, (err) => {
-                console.log(err);
                 return res.status(500).json({
                     "message": req.t("DB_ERROR")
                 });
@@ -1070,7 +1060,6 @@ userCtr.logout = (req, res) => {
 
     userTokenModel.deleteToken({ token: token }, (err) => {
         if (!utils.empty(err)) {
-            console.log(err)
             return res.status(500).json({
                 data: [],
                 status: false,
@@ -1185,7 +1174,6 @@ userCtr.deleteReview = (req, res) => {
 
     reviewModel.deleteReview(filter, (err) => {
         if (!utils.empty(err)) {
-            console.log(err)
             return res.status(500).json({
                 data: [],
                 status: false,
@@ -1217,7 +1205,6 @@ userCtr.addWhishlist = (req, res) => {
         (callback) => {
             wishlistModel.getData(filter, (err, eventDetails) => {
                 if (!utils.empty(err)) {
-                    console.log(err, 'err')
                     callback(req.t("DB_ERROR"));
                 } else if (!utils.empty(eventDetails) && eventDetails.length > 0) {
                     callback(null, 1);
@@ -1393,7 +1380,6 @@ userCtr.updatelocation = (req, res) => {
         }
     ], (err, eventList) => {
         if (!!err) {
-            console.log(err);
             res.status(500).json({
                 data: [],
                 status: false,
@@ -1412,7 +1398,6 @@ userCtr.updatelocation = (req, res) => {
 
 userCtr.nearby = (req, res) => {
     let input = req.body;
-    console.log(input);
     let loginUserId = req.authUser._id;
     let filter = {};
     waterfall([
@@ -1422,7 +1407,6 @@ userCtr.nearby = (req, res) => {
                     if (!!err) {
                         callback(err);
                     } else {
-                        console.log(eventList);
                         callback(null, { events: eventList });
                     }
                 });
@@ -1431,7 +1415,6 @@ userCtr.nearby = (req, res) => {
                     if (!!err) {
                         callback(err);
                     } else {
-                        console.log(placeList);
                         callback(null, { places: placeList });
                     }
                 });
@@ -1440,7 +1423,6 @@ userCtr.nearby = (req, res) => {
                     if (!!err) {
                         callback(err);
                     } else {
-                        console.log(eventList);
                         callback(null, { user: eventList });
                     }
                 });
