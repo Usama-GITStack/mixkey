@@ -191,7 +191,7 @@ userSchema.statics.getNearby = function(input, callback) {
         var earthRadiusInMiles = 3963.2;
         return earthRadiusInMiles;
     };
-    let query = {status : 'ACTIVE',$or:[{nativeLanguage:{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.practiceLanguage, 'i') }}]};
+    let query = {status : 'ACTIVE',$or:[{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }}]};
     query.status = 'ACTIVE';
     query.loc = {
         $geoWithin: {
