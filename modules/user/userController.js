@@ -363,11 +363,20 @@ userCtr.createUser = (req, res) => {
 }
 
 userCtr.getUserList = (req, res) => {
-    console.log("get user list...");
+    
     let input = req.body;
-    console.log(input);
     let userId = req.authUser._id;
-    let filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},$or: [{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }},{userName:{$regex: new RegExp('^' + input.searchText,'i')}}]};
+    let filter = {};
+    if(input.searchText == "" || input.searchText == undefined)
+    {
+        console.log("nosearchtext");
+        filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},$or: [{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }}]};
+    }    
+    else{
+        console.log("searchtext");
+        filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},userName:{$regex: new RegExp('^' + input.searchText,'i')},$or: [{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}}]};
+    }
+        
     // filter.userRole = 2;
     // if (!utils.empty(req.authUser) && req.authUser.userRole === 2) {
     //     filter.status = "ACTIVE";
@@ -434,7 +443,6 @@ userCtr.getUserList = (req, res) => {
         filter.fullName = new RegExp(input.searchName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i");
     }
     let select = userCtr.getFields('login');
-    console.log(filter);
     userModel.getUserList(filter, pg, limit, select, (err, total, users) => {
         // console.log('main user', users);
         if (!!err) {
