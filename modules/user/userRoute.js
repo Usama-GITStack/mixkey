@@ -230,6 +230,15 @@ let getUsersMiddleware = [
 ];
 userRouter.post('/userList', getUsersMiddleware);
 
+
+
+// let getUsersMiddleware = [
+//     auth.isAuthenticatedUser,
+//     userCtr.getfilteredUserList
+// ];
+// userRouter.post('/userfilteredList', getUsersMiddleware);
+
+
 /**
  * @api {post} /user/profile User Profile
  * @apiName User Profile
