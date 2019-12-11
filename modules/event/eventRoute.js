@@ -119,7 +119,7 @@ eventRouter.post('/eventList', geteventsMiddleware);
  * @apiUse ServerError
  */
 
-let geteventsActiveMiddleware = [eventCtr.getActiveEventList];
+let geteventsActiveMiddleware = [auth.isAuthenticatedUser,eventCtr.getActiveEventList];
 eventRouter.post('/activeEventList', geteventsActiveMiddleware);
 
 /**
