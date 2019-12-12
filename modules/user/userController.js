@@ -1564,7 +1564,9 @@ userCtr.updatelocation = (req, res) => {
 userCtr.nearby = (req, res) => {
     let input = req.body;
     let loginUserId = req.authUser._id;
-    let filter = {};
+    let currentDate = new Date();
+  // let filter = { startDate: { $lt: currentDate }, endDate: { $gt: currentDate } };
+    let filter = { endDate: { $gt: currentDate } };
     waterfall([
         (callback) => {
             if (input.listType === "event") {

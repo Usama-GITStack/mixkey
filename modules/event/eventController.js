@@ -117,7 +117,7 @@ eventCtr.createEvent = (req, res) => {
 
 eventCtr.getEventList = (req, res) => {
 
-  
+  console.log("eventlist");
   let input = req.body;
   let loginUserId = req.authUser._id;
   let filter = {};
@@ -157,6 +157,7 @@ eventCtr.getEventList = (req, res) => {
         total: total,
         max: limit,
       };
+      console.log(eventCtr.setWishlistFlag(events, loginUserId));
       res.status(200).json({
         pagination: pagination,
         data: eventCtr.setWishlistFlag(events, loginUserId),
@@ -267,6 +268,7 @@ eventCtr.getEventById = (req,res) => {
 }
 
 eventCtr.getActiveEventList = (req, res) => {
+  console.log("activeeventlisthit");
   let input = req.body;
   let loginUserId = req.authUser._id;
   let currentDate = new Date();
@@ -308,6 +310,7 @@ eventCtr.getActiveEventList = (req, res) => {
         total: total,
         max: limit,
       };
+      console.log("eventlist")
       res.status(200).json({
         pagination: pagination,
         data: eventCtr.setWishlistFlag(events, loginUserId),

@@ -105,11 +105,12 @@ eventSchema.statics.getNearby = function(input, callback) {
     //         "$in": input.learningLanguage
     //     };
     // }
-    this.find(query).exec((err, resultObj) => {
+    this.find().exec((err, resultObj) => {
         let idobject = resultObj.map(obj => obj._id);
         this.aggregate([{
                 "$match": {
-                    "_id": { "$in": idobject }
+                    "_id": { "$in": idobject },
+                    "endDate":{ "$gt": new Date()}
                 }
             },
             {
