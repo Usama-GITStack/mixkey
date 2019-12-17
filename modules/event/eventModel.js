@@ -110,7 +110,7 @@ eventSchema.statics.getNearby = function(input, callback) {
         this.aggregate([{
                 "$match": {
                     "_id": { "$in": idobject },
-                    "endDate":{ "$gt": new Date()}
+                    "endDate":{ "$gte": new Date()}
                 }
             },
             {
