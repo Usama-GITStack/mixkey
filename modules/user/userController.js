@@ -10,6 +10,7 @@ const userTokenModel = require('./userTokenModel');
 const notificationUtils = require('../../helper/notificationUtils');
 const messageModel = require('./messageModel');
 const wishlistModel = require('./wishlistModel');
+const blockuserModel = require('./blockuserModel')
 const placeModel = require('../place/placeModel');
 const eventModel = require('../event/eventModel');
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -362,279 +363,161 @@ userCtr.createUser = (req, res) => {
     });
 }
 
-userCtr.getUserList = (req, res) => {
-    
-    console.log(req.body);
+userCtr.blockUser = (req,res)=>{
     let input = req.body;
-    let userId = req.authUser._id;
-    let filter = {};
-    if(input.filter == "NoFilter"){
-        filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},$or: [{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }}]};
-    }else if(input.filter == "ApplyFilter"){
-        if(input.searchText == "" && (req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && (req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All'))
-            filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId}};
-        else if(input.searchText == "")
-        {
-            if(!(req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && !(req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
-                console.log("both present");
-                filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
-            }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All')){
-                console.log("practice present");
-                filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage }};
-            }else if((req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
-                console.log("native present");
-                filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }};
-            }
-        }else{
-            console.log(req.body.practiceLanguage);
-            if(!(req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && !(req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
-                console.log("both present");
-                filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
-            }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && (req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
-                console.log("both absent");
-                filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},userName:{$regex: new RegExp('^' + input.searchText,'i')}};
-            }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All')){
-                console.log("practice present");
-                filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage }};
-            }else if((req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
-                console.log("native present");
-                filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$ne':userId},"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }};    
-            }
-        }
-    }
-    
-        
-    // filter.userRole = 2;
-    // if (!utils.empty(req.authUser) && req.authUser.userRole === 2) {
-    //     filter.status = "ACTIVE";
-    // }
-    // filter._id = { "$ne": userId };
-    // if (!utils.empty(input.practiceLanguage) && input.practiceLanguage!= 'Empty') {
-    //     filter.nativeLanguage = { "$in": input.practiceLanguage };
-    //     // filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
-    //     // filter["practiceLanguage.language"] = input.practiceLanguage;
-    // }
-    // if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && input.nativeLanguage!= 'Empty') {
-        
+    let blockData = {
+        userId: input.userId,
+        blockUserId: input.blockUserId
+    };
 
-    //     // filter["practiceLanguage.language"] = {"$in":input.nativeLanguage};
-    //     //console.log(filter["praticeLanguage.language"]);
-    //     if(input.nativeLanguage.length>1)
-    //     { 
-    //         filter["practiceLanguage.language"] = {"$in":input.nativeLanguage};
-    //         // filter.nativeLanguage = { "$in": input.nativeLanguage };
-    //     }
-    //     else
-    //     {
-    //         filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.nativeLanguage, 'i') };
-    //         // filter.nativeLanguage = {$regex: new RegExp('^' + input.nativeLanguage,'i')};
-    //     }
-        
-    //     // filter.nativeLanguage = { "$in": input.nativeLanguage };
-    // }
-    // if(!utils.empty(input.searchText) && input.searchText != '')    
-    // {
-    //     // filter.userName = {$regex: new RegExp('^' + input.searchText,'i')};
-    //     // filter.userName = {"$in":input.searchText};
-    //     //filter.userName = input.searchText;
-    // }
-    // if (!utils.empty(input.nativeLangCode)) {
-    //     filter.nativeLangCode = input.nativeLangCode;
-    // }
-    // if (!utils.empty(input.praticeLangCode)) {
-    //     filter.praticeLangCode = input.praticeLangCode;
-    // }
-    if (!utils.empty(input.ageMin) && !utils.empty(input.ageMax)) {
-        filter.age = {
-            '$gte': input.ageMin,
-            '$lte': input.ageMax
-        }
-    }
-    if (!utils.empty(input.gender)) {
-        filter.gender = input.gender;
-    }
-    if (!utils.empty(input.country)) {
-        filter.country = input.country;
-    }
-    let limit = config.MAX_RECORDS;
-    let pg = 0;
-    if (utils.isDefined(input.pg) && (parseInt(input.pg) > 1)) {
-        pg = parseInt(input.pg - 1) * limit;
-    } else {
-        if (input.pg == -1) {
-            pg = 0;
-            limit = null;
-        }
-    }
-    if (!utils.empty(input.searchName)) {
-        filter.fullName = new RegExp(input.searchName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i");
-    }
-    let select = userCtr.getFields('login');
-    userModel.getUserList(filter, pg, limit, select, (err, total, users) => {
-        // console.log('main user', users);
-        if (!!err) {
-            res.status(500).json({
-                data: [],
-                status: false,
-                "message": req.t("DB_ERROR")
+    var object = new blockuserModel(blockData);
+    object.save((err) => {
+        if (err) {
+            return res.status(500).json({
+                "message": error
             });
-        } else if (total > 0) {
-            let pages = Math.ceil(total / limit);
-            let newUsers = users.map( (obj) => {
-                obj.imageURL = config.userURL;
-                return obj;
-            });
-            let pagination = {
-                pages: pages ? pages : 1,
-                total: total,
-                max: limit
-            };
-            res.status(200).json({
-                pagination: pagination,
-                data: newUsers,
-                status: true,
-                imageurlPath: config.userURL,
-                message: ""
-            });
-        } else {
-            res.status(400).json({
-                data: [],
-                status: true,
-                "message": req.t("NO_RECORD_FOUND")
-            });
+        }else {
+            return res.status(200).json("success");
         }
     });
 }
 
+userCtr.getBlockedUsers = (req,res) => {
+    let input = req.authUser._id;
+    blockuserModel.find({userId: input}).then(function(result){
+		if(result[0] === undefined){ 
+			res.json(null);
+		}else {
+			res.json(result);
+		}
+	});
+}
 
-// userCtr.getfilteredUserList = (req, res) => {
+userCtr.getUserList = (req, res) => {
     
-//     console.log(req.body.practiceLanguage);
-//     let input = req.body;
-//     let userId = req.authUser._id;
-//     let filter = {};
-//     if(input.searchText == "" && (req.body.nativeLanguage[0] == 'Empty' || req.body.nativeLanguage == 'Empty') && (req.body.practiceLanguage[0] == 'Empty' || req.body.practiceLanguage == 'Empty'))
-//         filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId}};
-//     else if(input.searchText == "")
-//     {
-//         if(!(req.body.nativeLanguage[0] == 'Empty' || req.body.nativeLanguage == 'Empty') && !(req.body.practiceLanguage[0] == 'Empty' || req.body.practiceLanguage == 'Empty'))
-//             filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
-//         else if((req.body.nativeLanguage[0] == 'Empty' || req.body.nativeLanguage == 'Empty'))
-//             filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage }};
-//         else if((req.body.practiceLanguage[0] == 'Empty' || req.body.practiceLanguage == 'Empty'))
-//             filter = {userRole:2,status:'ACTIVE',_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage }};
-        
-//     }    
-//     else{
-//         if(!(req.body.nativeLanguage[0] == 'Empty' || req.body.nativeLanguage == 'Empty') && !(req.body.practiceLanguage[0] == 'Empty' || req.body.practiceLanguage == 'Empty'))
-//             filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
-//         else if((req.body.nativeLanguage[0] == 'Empty' || req.body.nativeLanguage == 'Empty'))
-//             filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage }};
-//         else if((req.body.practiceLanguage[0] == 'Empty' || req.body.practiceLanguage == 'Empty'))
-//             filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$ne':userId},nativeLanguage:{ "$in": input.practiceLanguage }};    
-//     }
-        
-//     // filter.userRole = 2;
-//     // if (!utils.empty(req.authUser) && req.authUser.userRole === 2) {
-//     //     filter.status = "ACTIVE";
-//     // }
-//     // filter._id = { "$ne": userId };
-//     // if (!utils.empty(input.practiceLanguage) && input.practiceLanguage!= 'Empty') {
-//     //     filter.nativeLanguage = { "$in": input.practiceLanguage };
-//     //     // filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.practiceLanguage, 'i') };
-//     //     // filter["practiceLanguage.language"] = input.practiceLanguage;
-//     // }
-//     // if (!utils.empty(input.nativeLanguage) && input.nativeLanguage.length > 0 && input.nativeLanguage!= 'Empty') {
-        
+    // console.log(req.body);
 
-//     //     // filter["practiceLanguage.language"] = {"$in":input.nativeLanguage};
-//     //     //console.log(filter["praticeLanguage.language"]);
-//     //     if(input.nativeLanguage.length>1)
-//     //     { 
-//     //         filter["practiceLanguage.language"] = {"$in":input.nativeLanguage};
-//     //         // filter.nativeLanguage = { "$in": input.nativeLanguage };
-//     //     }
-//     //     else
-//     //     {
-//     //         filter["practiceLanguage.language"] = { $regex: new RegExp('^' + input.nativeLanguage, 'i') };
-//     //         // filter.nativeLanguage = {$regex: new RegExp('^' + input.nativeLanguage,'i')};
-//     //     }
+    let input = req.body;
+    let userId = req.authUser._id;
+    waterfall([
+        (callback) => {
+            blockuserModel.find({userId: req.authUser._id}).then(function(result){
+                if(result[0] === undefined){ 
+                    callback(null);
+                }else {
+                    callback(result);
+                }
+            });
+        }
+    ], (blockUser) => {
+        let blockUsers = [];
+        blockUser.push(userId);
+        if (!utils.empty(blockUser)) {
+           for(var entry of blockUser){
+               blockUser.push(entry.blockUserId);
+           }
+        }
+        let filter = {};
+        if(input.filter == "NoFilter"){
+            filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},$or: [{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }}]};
+        }else if(input.filter == "ApplyFilter"){
+            if(input.searchText == "" && (req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && (req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All'))
+                filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers}};
+            else if(input.searchText == "")
+            {
+                if(!(req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && !(req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
+                    // console.log("both present");
+                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
+                }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All')){
+                    // console.log("practice present");
+                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage }};
+                }else if((req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
+                    // console.log("native present");
+                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }};
+                }
+            }else{
+                console.log(req.body.practiceLanguage);
+                if(!(req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && !(req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
+                    // console.log("both present");
+                    filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
+                }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && (req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
+                    // console.log("both absent");
+                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},userName:{$regex: new RegExp('^' + input.searchText,'i')}};
+                }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All')){
+                    // console.log("practice present");
+                    filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage }};
+                }else if((req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
+                    // console.log("native present");
+                    filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }};    
+                }
+            }
+        }
         
-//     //     // filter.nativeLanguage = { "$in": input.nativeLanguage };
-//     // }
-//     // if(!utils.empty(input.searchText) && input.searchText != '')    
-//     // {
-//     //     // filter.userName = {$regex: new RegExp('^' + input.searchText,'i')};
-//     //     // filter.userName = {"$in":input.searchText};
-//     //     //filter.userName = input.searchText;
-//     // }
-//     // if (!utils.empty(input.nativeLangCode)) {
-//     //     filter.nativeLangCode = input.nativeLangCode;
-//     // }
-//     // if (!utils.empty(input.praticeLangCode)) {
-//     //     filter.praticeLangCode = input.praticeLangCode;
-//     // }
-//     if (!utils.empty(input.ageMin) && !utils.empty(input.ageMax)) {
-//         filter.age = {
-//             '$gte': input.ageMin,
-//             '$lte': input.ageMax
-//         }
-//     }
-//     if (!utils.empty(input.gender)) {
-//         filter.gender = input.gender;
-//     }
-//     if (!utils.empty(input.country)) {
-//         filter.country = input.country;
-//     }
-//     let limit = config.MAX_RECORDS;
-//     let pg = 0;
-//     if (utils.isDefined(input.pg) && (parseInt(input.pg) > 1)) {
-//         pg = parseInt(input.pg - 1) * limit;
-//     } else {
-//         if (input.pg == -1) {
-//             pg = 0;
-//             limit = null;
-//         }
-//     }
-//     if (!utils.empty(input.searchName)) {
-//         filter.fullName = new RegExp(input.searchName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i");
-//     }
-//     let select = userCtr.getFields('login');
-//     userModel.getUserList(filter, pg, limit, select, (err, total, users) => {
-//         // console.log('main user', users);
-//         if (!!err) {
-//             res.status(500).json({
-//                 data: [],
-//                 status: false,
-//                 "message": req.t("DB_ERROR")
-//             });
-//         } else if (total > 0) {
-//             let pages = Math.ceil(total / limit);
-//             let newUsers = users.map( (obj) => {
-//                 obj.imageURL = config.userURL;
-//                 return obj;
-//             });
-//             let pagination = {
-//                 pages: pages ? pages : 1,
-//                 total: total,
-//                 max: limit
-//             };
-//             res.status(200).json({
-//                 pagination: pagination,
-//                 data: newUsers,
-//                 status: true,
-//                 imageurlPath: config.userURL,
-//                 message: ""
-//             });
-//         } else {
-//             res.status(400).json({
-//                 data: [],
-//                 status: true,
-//                 "message": req.t("NO_RECORD_FOUND")
-//             });
-//         }
-//     });
-// }
+            
+       
+        if (!utils.empty(input.ageMin) && !utils.empty(input.ageMax)) {
+            filter.age = {
+                '$gte': input.ageMin,
+                '$lte': input.ageMax
+            }
+        }
+        if (!utils.empty(input.gender)) {
+            filter.gender = input.gender;
+        }
+        if (!utils.empty(input.country)) {
+            filter.country = input.country;
+        }
+        let limit = config.MAX_RECORDS;
+        let pg = 0;
+        if (utils.isDefined(input.pg) && (parseInt(input.pg) > 1)) {
+            pg = parseInt(input.pg - 1) * limit;
+        } else {
+            if (input.pg == -1) {
+                pg = 0;
+                limit = null;
+            }
+        }
+        if (!utils.empty(input.searchName)) {
+            filter.fullName = new RegExp(input.searchName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i");
+        }
+        let select = userCtr.getFields('login');
+        userModel.getUserList(filter, pg, limit, select, (err, total, users) => {
+            // console.log('main user', users);
+            if (!!err) {
+                res.status(500).json({
+                    data: [],
+                    status: false,
+                    "message": req.t("DB_ERROR")
+                });
+            } else if (total > 0) {
+                let pages = Math.ceil(total / limit);
+                let newUsers = users.map( (obj) => {
+                    obj.imageURL = config.userURL;
+                    return obj;
+                });
+                let pagination = {
+                    pages: pages ? pages : 1,
+                    total: total,
+                    max: limit
+                };
+                res.status(200).json({
+                    pagination: pagination,
+                    data: newUsers,
+                    status: true,
+                    imageurlPath: config.userURL,
+                    message: ""
+                });
+            } else {
+                res.status(400).json({
+                    data: [],
+                    status: true,
+                    "message": req.t("NO_RECORD_FOUND")
+                });
+            }
+        });
+    }); 
+}
+
 
 userCtr.updateUser = (req, res) => {
     let input = req.body;
@@ -979,113 +862,137 @@ userCtr.forgotPassword = (req, res) => {
 userCtr.getContactUserList = (req, res) => {
     let input = req.body;
     let userId = req.authUser._id;
-    let filter = [{
-            "$match": {
-                "$or": [{ from: ObjectId(userId) },
-                    { to: ObjectId(userId) }
-                ]
-
-            }
-        },
-        { "$sort": { "createdAt": -1, } },
-        {
-            "$group": {
-                "_id": "$messageId",
-                "to": { "$first": "$to" },
-                "message": { "$first": "$message" },
-                "from": { "$first": "$from" },
-                "createdAt": { "$first": "$createdAt" },
-                "count": { "$sum": { "$cond": { if: { $and: [{$eq: ["$read", 1]}, {$eq: ["$to", ObjectId(userId)]}] }, then: 1, else: 0 } } },
-            }
-        },
-        {
-            "$lookup": {
-                "from": "users",
-                "localField": "from",
-                "foreignField": "_id",
-                "as": "from"
-            }
-        },
-        {
-            "$unwind": "$from"
-        },
-        {
-            "$lookup": {
-                "from": "users",
-                "localField": "to",
-                "foreignField": "_id",
-                "as": "to"
-            }
-        },
-        {
-            "$unwind": "$to"
-        },
-        { "$sort": { "createdAt": 1, } },
-        {
-            "$project": {
-                "_id": 1,
-                "message": 1,
-                "createdAt": 1,
-                "count": 1,
-                "from._id": 1,
-                "from.fullName": 1,
-                "from.email": 1,
-                "from.userName": 1,
-                "from.profilePic": 1,
-                "from.practiceLanguage":1,
-                "from.nativeLanguage":1,
-                "to._id": 1,
-                "to.fullName": 1,
-                "to.email": 1,
-                "to.userName": 1,
-                "to.profilePic": 1,
-                "to.practiceLanguage":1,
-                "to.nativeLanguage":1,
-            }
-        },
-    ];
-
-    let limit = config.MAX_RECORDS;
-    let pg = 0;
-    if (utils.isDefined(input.pg) && (parseInt(input.pg) > 1)) {
-        pg = parseInt(input.pg - 1) * limit;
-    } else {
-        if (input.pg == -1) {
-            pg = 0;
-            limit = null;
+    waterfall([
+        (callback) => {
+            blockuserModel.find({userId: req.authUser._id}).then(function(result){
+                if(result[0] === undefined){ 
+                    callback(null);
+                }else {
+                    callback(result);
+                }
+            });
         }
-    }
-    messageModel.contactUserList(filter, pg, limit, (err, userList) => {
-        let total = (!!userList) ? userList.length : 0;
-        if (!!err) {
-            res.status(500).json({
-                data: [],
-                status: false,
-                "message": req.t("DB_ERROR")
-            });
-        } else if (total > 0) {
-            let pages = Math.ceil(total / limit);
-            let pagination = {
-                pages: pages ? pages : 1,
-                total: total,
-                max: limit
-            };
-            userList.reverse();
-            res.status(200).json({
-                pagination: pagination,
-                data: userList,
-                status: true,
-                message: "",
-                imageurlPath: config.userURL,
-            });
+    ], (blockUser) => {
+        let blockUsers = [];
+        blockUser.push(userId);
+        if (!utils.empty(blockUser)) {
+           for(var entry of blockUser){
+               blockUser.push(entry.blockUserId);
+           }
+        }
+        let filter = [{
+                to:{"$nin":blockUsers},from:{"$nin":this.blockUser}
+            },
+            {
+                "$match": {
+                    "$or": [{ from: ObjectId(userId) },
+                        { to: ObjectId(userId) }
+                    ]
+
+                }
+            },
+            { "$sort": { "createdAt": -1, } },
+            {
+                "$group": {
+                    "_id": "$messageId",
+                    "to": { "$first": "$to" },
+                    "message": { "$first": "$message" },
+                    "from": { "$first": "$from" },
+                    "createdAt": { "$first": "$createdAt" },
+                    "count": { "$sum": { "$cond": { if: { $and: [{$eq: ["$read", 1]}, {$eq: ["$to", ObjectId(userId)]}] }, then: 1, else: 0 } } },
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "users",
+                    "localField": "from",
+                    "foreignField": "_id",
+                    "as": "from"
+                }
+            },
+            {
+                "$unwind": "$from"
+            },
+            {
+                "$lookup": {
+                    "from": "users",
+                    "localField": "to",
+                    "foreignField": "_id",
+                    "as": "to"
+                }
+            },
+            {
+                "$unwind": "$to"
+            },
+            { "$sort": { "createdAt": 1, } },
+            {
+                "$project": {
+                    "_id": 1,
+                    "message": 1,
+                    "createdAt": 1,
+                    "count": 1,
+                    "from._id": 1,
+                    "from.fullName": 1,
+                    "from.email": 1,
+                    "from.userName": 1,
+                    "from.profilePic": 1,
+                    "from.practiceLanguage":1,
+                    "from.nativeLanguage":1,
+                    "to._id": 1,
+                    "to.fullName": 1,
+                    "to.email": 1,
+                    "to.userName": 1,
+                    "to.profilePic": 1,
+                    "to.practiceLanguage":1,
+                    "to.nativeLanguage":1,
+                }
+            },
+        ];
+
+        let limit = config.MAX_RECORDS;
+        let pg = 0;
+        if (utils.isDefined(input.pg) && (parseInt(input.pg) > 1)) {
+            pg = parseInt(input.pg - 1) * limit;
         } else {
-            res.status(400).json({
-                data: [],
-                status: true,
-                "message": req.t("NO_RECORD_FOUND")
-            });
+            if (input.pg == -1) {
+                pg = 0;
+                limit = null;
+            }
         }
+        messageModel.contactUserList(filter, pg, limit, (err, userList) => {
+            let total = (!!userList) ? userList.length : 0;
+            if (!!err) {
+                res.status(500).json({
+                    data: [],
+                    status: false,
+                    "message": req.t("DB_ERROR")
+                });
+            } else if (total > 0) {
+                let pages = Math.ceil(total / limit);
+                let pagination = {
+                    pages: pages ? pages : 1,
+                    total: total,
+                    max: limit
+                };
+                userList.reverse();
+                res.status(200).json({
+                    pagination: pagination,
+                    data: userList,
+                    status: true,
+                    message: "",
+                    imageurlPath: config.userURL,
+                });
+            } else {
+                res.status(400).json({
+                    data: [],
+                    status: true,
+                    "message": req.t("NO_RECORD_FOUND")
+                });
+            }
+        });
     });
+
+    
 }
 
 userCtr.setPassword = (req, res) => {
@@ -1571,6 +1478,7 @@ userCtr.nearby = (req, res) => {
         (callback) => {
             if (input.listType === "event") {
                 eventModel.getNearby(input, (err, eventList) => {
+                    console.log(eventList);
                     if (!!err) {
                         callback(err);
                     } else {

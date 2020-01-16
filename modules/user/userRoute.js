@@ -632,6 +632,12 @@ userRouter.post('/logout', logoutMiddleware);
 let dashboardMiddleware = [auth.isAuthenticatedUser, userCtr.dashboard];
 userRouter.post('/dashboard', dashboardMiddleware);
 
+let blockuserMiddleware = [auth.isAuthenticatedUser,userCtr.blockUser];
+userRouter.post('/blockuser', userCtr.blockUser);
+
+let getblockuserMiddleware = [auth.isAuthenticatedUser, userCtr.getBlockedUsers];
+userRouter.post('/getblockuser', getblockuserMiddleware);
+
 let nearbyMiddleware = [auth.isAuthenticatedUser, userMiddleware.validateInput('nearby'), userCtr.nearby];
 userRouter.post('/nearby', nearbyMiddleware);
 

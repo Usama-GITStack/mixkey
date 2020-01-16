@@ -117,7 +117,7 @@ eventCtr.createEvent = (req, res) => {
 
 eventCtr.getEventList = (req, res) => {
 
-  console.log("eventlist");
+  // console.log("eventlist");
   let input = req.body;
   let loginUserId = req.authUser._id;
   let filter = {};
@@ -157,7 +157,7 @@ eventCtr.getEventList = (req, res) => {
         total: total,
         max: limit,
       };
-      console.log(eventCtr.setWishlistFlag(events, loginUserId));
+      // console.log(eventCtr.setWishlistFlag(events, loginUserId));
       res.status(200).json({
         pagination: pagination,
         data: eventCtr.setWishlistFlag(events, loginUserId),
@@ -176,8 +176,8 @@ eventCtr.getEventList = (req, res) => {
 };
 
 eventCtr.getEventById = (req,res) => {
-  console.log("Hittingg!!!");
-  console.log(req.body);
+  // console.log("Hittingg!!!");
+  // console.log(req.body);
     let temp;
     let loginUserId = req.body.authId;
     let currentDate = new Date();
@@ -188,7 +188,7 @@ eventCtr.getEventById = (req,res) => {
     let select = eventCtr.getFields();
     let filter = {};
     filter.status = 'ACTIVE';
-    console.log(loginUserId);
+    // console.log(loginUserId);
     eventModel.eventList(filter,0,null ,loginUserId, (err, total, events) => {
 
       if (!!err) {
@@ -268,7 +268,7 @@ eventCtr.getEventById = (req,res) => {
 }
 
 eventCtr.getActiveEventList = (req, res) => {
-  console.log("activeeventlisthit");
+  // console.log("activeeventlisthit");
   let input = req.body;
   let loginUserId = req.authUser._id;
   let currentDate = new Date();
@@ -310,7 +310,7 @@ eventCtr.getActiveEventList = (req, res) => {
         total: total,
         max: limit,
       };
-      console.log("eventlist")
+      // console.log("eventlist")
       res.status(200).json({
         pagination: pagination,
         data: eventCtr.setWishlistFlag(events, loginUserId),
@@ -330,7 +330,7 @@ eventCtr.getActiveEventList = (req, res) => {
 
 eventCtr.setWishlistFlag = (places, loginUserId) => {
   let temp;
-  console.log(places);
+  // console.log(places);
   places.map(obj => {
     temp = 0;
     if (!!obj.wishlist && obj.wishlist.length > 0) {
