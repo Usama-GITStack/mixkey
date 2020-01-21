@@ -11,6 +11,7 @@ const notificationUtils = require('../../helper/notificationUtils');
 const messageModel = require('./messageModel');
 const wishlistModel = require('./wishlistModel');
 const blockuserModel = require('./blockuserModel')
+const reporteduserModel = require('./reporteduserModel')
 const placeModel = require('../place/placeModel');
 const eventModel = require('../event/eventModel');
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -363,10 +364,28 @@ userCtr.createUser = (req, res) => {
     });
 }
 
+userCtr.reportUser = (req,res) => {
+    let input = req.body;
+    let reportData = {
+        userId:input.userId
+    };
+    var object = new reporteduserModel(reportData);
+    object.save((err) => {
+        if (err) {
+            return res.status(500).json({
+                "message": error
+            });
+        }else {
+            return res.status(200).json("success");
+        }
+    })
+}
+
 userCtr.blockUser = (req,res)=>{
+    console.log(req.body);
     let input = req.body;
     let blockData = {
-        userId: input.userId,
+        userId: input.authId,
         blockUserId: input.blockUserId
     };
 
@@ -383,40 +402,77 @@ userCtr.blockUser = (req,res)=>{
 }
 
 userCtr.getBlockedUsers = (req,res) => {
-    let input = req.authUser._id;
+    let input = req.body.userId;
     blockuserModel.find({userId: input}).then(function(result){
 		if(result[0] === undefined){ 
 			res.json(null);
 		}else {
-			res.json(result);
+            var usersIds = [];
+            for(var entry of result){
+                usersIds.push(entry.blockUserId)
+            }
+            console.log(usersIds);
+            userModel.find({_id:{"$in":usersIds}}).then(function(result1){
+                res.json(result1);
+            })
+			
 		}
 	});
 }
 
+
+userCtr.removeBlockedUsers = (req,res) => {
+    
+    let input = req.body;
+    console.log(input);
+    blockuserModel.remove({'userId':input.authId,'blockUserId':input.blockUserId}).then(function(result){
+        res.status(200).json("Success");
+    });
+}
+
 userCtr.getUserList = (req, res) => {
     
-    // console.log(req.body);
+    
 
     let input = req.body;
     let userId = req.authUser._id;
+    let blockUsers = [];
     waterfall([
         (callback) => {
             blockuserModel.find({userId: req.authUser._id}).then(function(result){
+                
                 if(result[0] === undefined){ 
-                    callback(null);
+                    reporteduserModel.find({}).then(function(result1){
+                        if(result1[0] === undefined )
+                            callback(null);
+                        else
+                            callback(result1);
+                    });
                 }else {
-                    callback(result);
+                    for(var entry of result){
+                        blockUsers.push(entry.blockUserId)
+                    }
+                    reporteduserModel.find({}).then(function(result1){
+                        console.log(result1._doc);
+                        if(result1[0] === undefined )
+                            callback(null);
+                        else
+                            callback(result1);
+                    });
                 }
             });
         }
-    ], (blockUser) => {
-        let blockUsers = [];
-        blockUser.push(userId);
-        if (!utils.empty(blockUser)) {
-           for(var entry of blockUser){
-               blockUser.push(entry.blockUserId);
+    ], (blockUserids) => {
+        // console.log(blockUserids);
+        
+        blockUsers.push(userId);
+        
+        if (!utils.empty(blockUserids)) {
+           for(var entry of blockUserids){
+               blockUsers.push(entry.userId);
            }
         }
+        
         let filter = {};
         if(input.filter == "NoFilter"){
             filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},$or: [{nativeLanguage:{ "$in": input.practiceLanguage }},{"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }}]};
@@ -436,7 +492,7 @@ userCtr.getUserList = (req, res) => {
                     filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }};
                 }
             }else{
-                console.log(req.body.practiceLanguage);
+
                 if(!(req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && !(req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
                     // console.log("both present");
                     filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
@@ -481,6 +537,7 @@ userCtr.getUserList = (req, res) => {
             filter.fullName = new RegExp(input.searchName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i");
         }
         let select = userCtr.getFields('login');
+        
         userModel.getUserList(filter, pg, limit, select, (err, total, users) => {
             // console.log('main user', users);
             if (!!err) {
@@ -860,29 +917,41 @@ userCtr.forgotPassword = (req, res) => {
 };
 
 userCtr.getContactUserList = (req, res) => {
+    console.log(req.body);
     let input = req.body;
     let userId = req.authUser._id;
+    let blockUsers = [];
     waterfall([
         (callback) => {
             blockuserModel.find({userId: req.authUser._id}).then(function(result){
                 if(result[0] === undefined){ 
-                    callback(null);
+                    reporteduserModel.find({}).then(function(result1){
+                        if(result1[0] === undefined )
+                            callback(null);
+                        else
+                            callback(result1);
+                    });
                 }else {
-                    callback(result);
+                    for(var entry of result){
+                        blockUsers.push(entry.blockUserId)
+                    }
+                    reporteduserModel.find({}).then(function(result1){
+                        if(result1[0] === undefined )
+                            callback(null);
+                        else
+                            callback(result1);
+                    })
                 }
             });
         }
-    ], (blockUser) => {
-        let blockUsers = [];
-        blockUser.push(userId);
-        if (!utils.empty(blockUser)) {
-           for(var entry of blockUser){
-               blockUser.push(entry.blockUserId);
+    ], (blockUserids) => {
+        if (!utils.empty(blockUserids)) {
+           for(var entry of blockUserids){
+               blockUsers.push(entry.userId);
            }
         }
-        let filter = [{
-                to:{"$nin":blockUsers},from:{"$nin":this.blockUser}
-            },
+        console.log(blockUsers);
+        let filter = [
             {
                 "$match": {
                     "$or": [{ from: ObjectId(userId) },
@@ -948,7 +1017,7 @@ userCtr.getContactUserList = (req, res) => {
                 }
             },
         ];
-
+        console.log(filter);
         let limit = config.MAX_RECORDS;
         let pg = 0;
         if (utils.isDefined(input.pg) && (parseInt(input.pg) > 1)) {
@@ -975,9 +1044,28 @@ userCtr.getContactUserList = (req, res) => {
                     max: limit
                 };
                 userList.reverse();
+                var responseList = [];
+                console.log(blockUsers);
+                for(var entry of userList){
+                    var i = 0;
+                    for(var block of blockUsers){
+                        console.log(block +" == "+ entry.to._id);
+                        if(block.toString() === entry.to._id.toString() || block.toString() == entry.from._id.toString()){
+                            console.log("break");
+                            break;
+                        }else{
+                            i=i+1;
+                        }
+                    }
+                    console.log(i);
+                    if(i === blockUsers.length){
+                        responseList.push(entry);
+                    }
+                }
+                console.log(responseList);
                 res.status(200).json({
                     pagination: pagination,
-                    data: userList,
+                    data: responseList,
                     status: true,
                     message: "",
                     imageurlPath: config.userURL,
@@ -1478,7 +1566,6 @@ userCtr.nearby = (req, res) => {
         (callback) => {
             if (input.listType === "event") {
                 eventModel.getNearby(input, (err, eventList) => {
-                    console.log(eventList);
                     if (!!err) {
                         callback(err);
                     } else {
