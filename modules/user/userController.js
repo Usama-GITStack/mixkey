@@ -483,10 +483,10 @@ userCtr.getUserList = (req, res) => {
             {
                 if(!(req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && !(req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
                     // console.log("both present");
-                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
+                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},"nativeLanguage":{ $regex: new RegExp('^' + input.practiceLanguage, 'i') },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
                 }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All')){
                     // console.log("practice present");
-                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage }};
+                    filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},"nativeLanguage":{ $regex: new RegExp('^' + input.practiceLanguage, 'i') }};
                 }else if((req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
                     // console.log("native present");
                     filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }};
@@ -495,13 +495,13 @@ userCtr.getUserList = (req, res) => {
 
                 if(!(req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && !(req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
                     // console.log("both present");
-                    filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
+                    filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},"nativeLanguage":{ $regex: new RegExp('^' + input.practiceLanguage, 'i') },"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i')}};
                 }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All') && (req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
                     // console.log("both absent");
                     filter = {userRole:2,status:'ACTIVE',_id:{'$nin':blockUsers},userName:{$regex: new RegExp('^' + input.searchText,'i')}};
                 }else if((req.body.nativeLanguage[0] == 'All' || req.body.nativeLanguage == 'All')){
                     // console.log("practice present");
-                    filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},nativeLanguage:{ "$in": input.practiceLanguage }};
+                    filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},"nativeLanguage":{ $regex: new RegExp('^' + input.practiceLanguage, 'i') }};
                 }else if((req.body.practiceLanguage[0] == 'All' || req.body.practiceLanguage == 'All')){
                     // console.log("native present");
                     filter = {userRole:2,status:'ACTIVE',userName:{$regex: new RegExp('^' + input.searchText,'i')},_id:{'$nin':blockUsers},"practiceLanguage.language":{ $regex: new RegExp('^' + input.nativeLanguage, 'i') }};    
