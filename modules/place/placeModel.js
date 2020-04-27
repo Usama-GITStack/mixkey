@@ -73,7 +73,7 @@ placeSchema.index({
 
 placeSchema.statics.getNearby = function(input, callback) {
     let milesToRadian = function(km) {
-        let miles = km * 0.621371;
+        let miles = 40075 * 0.621371;
         var earthRadiusInMiles = 3963.2;
         return earthRadiusInMiles;
     };
@@ -82,7 +82,7 @@ placeSchema.statics.getNearby = function(input, callback) {
         let kx = Math.cos(Math.PI * centerPoint.lat / 180.0) * ky;
         let dx = Math.abs(centerPoint.lng - checkPoint.lng) * kx;
         let dy = Math.abs(centerPoint.lat - checkPoint.lat) * ky;
-        return Math.sqrt(dx * dx + dy * dy) <= km;
+        return Math.sqrt(dx * dx + dy * dy) <= 40075;
     }
     let query = {};
     // query.loc = {
