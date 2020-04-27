@@ -1585,6 +1585,7 @@ userCtr.nearby = (req, res) => {
                     if (!!err) {
                         callback(err);
                     } else {
+                        console.log(eventList);
                         callback(null, { user: eventList });
                     }
                 });
