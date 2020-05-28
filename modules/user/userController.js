@@ -824,8 +824,8 @@ userCtr.getMessages = (req, res) => {
     let filter = {
         "$or": [{ "$and": [{ from: userId, to: input.userId }] },
             { "$and": [{ to: userId, from: input.userId }] }
-        ]
-    };
+        ],
+    }
 
     let limit = config.MAX_RECORDS;
     let pg = 0;
@@ -864,6 +864,41 @@ userCtr.getMessages = (req, res) => {
         } else {
             res.status(400).json({
                 data: [],
+                status: true,
+                "message": req.t("NO_RECORD_FOUND")
+            });
+        }
+    });
+}
+
+userCtr.getUnreadMessages = (req, res) => {
+    let input = req.body;
+    console.log(input);
+    let userId = input.authId;
+    let filter = {
+        "to":userId,
+        "read":1
+    }
+
+    messageModel.getMessageList(filter, 0, 1000, (err, total, messages) => {
+        console.log(total);
+        console.log(messages);
+        if (!!err) {
+            res.status(500).json({
+                data: 0,
+                status: false,
+                "message": req.t("DB_ERROR")
+            });
+        } else if (total > 0) {
+            // messageModel.update({ from: userId, to: input.userId }, { read: 0 }, { multi: true }, (er, details) => {});
+            res.status(200).json({
+                data: total,
+                status: true,
+                message: ""
+            });
+        } else {
+            res.status(400).json({
+                data: 0,
                 status: true,
                 "message": req.t("NO_RECORD_FOUND")
             });
@@ -917,7 +952,6 @@ userCtr.forgotPassword = (req, res) => {
 };
 
 userCtr.getContactUserList = (req, res) => {
-    console.log(req.body);
     let input = req.body;
     let userId = req.authUser._id;
     let blockUsers = [];
@@ -950,7 +984,6 @@ userCtr.getContactUserList = (req, res) => {
                blockUsers.push(entry.userId);
            }
         }
-        console.log(blockUsers);
         let filter = [
             {
                 "$match": {
@@ -1017,7 +1050,6 @@ userCtr.getContactUserList = (req, res) => {
                 }
             },
         ];
-        console.log(filter);
         let limit = config.MAX_RECORDS;
         let pg = 0;
         if (utils.isDefined(input.pg) && (parseInt(input.pg) > 1)) {
@@ -1045,24 +1077,20 @@ userCtr.getContactUserList = (req, res) => {
                 };
                 userList.reverse();
                 var responseList = [];
-                console.log(blockUsers);
                 for(var entry of userList){
                     var i = 0;
                     for(var block of blockUsers){
-                        console.log(block +" == "+ entry.to._id);
                         if(block.toString() === entry.to._id.toString() || block.toString() == entry.from._id.toString()){
-                            console.log("break");
+                            
                             break;
                         }else{
                             i=i+1;
                         }
                     }
-                    console.log(i);
                     if(i === blockUsers.length){
                         responseList.push(entry);
                     }
                 }
-                console.log(responseList);
                 res.status(200).json({
                     pagination: pagination,
                     data: responseList,

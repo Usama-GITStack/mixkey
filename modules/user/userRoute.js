@@ -356,6 +356,8 @@ let getMessagesMiddleware = [
 ];
 userRouter.post('/getMessages', getMessagesMiddleware);
 
+userRouter.post('/getUnreadMessages', userCtr.getUnreadMessages);
+
 /**
  * @api {post} /user/getContactUserList send message notification(push notification)
  * @apiName send message notification(push notification)
