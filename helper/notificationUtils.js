@@ -116,17 +116,21 @@ notificationUtil.sendNotification = (data, deviceToken, cb) => {
 */
 
 notificationUtil.sendPushNotification = (data, deviceToken, cb) => {
+    console.log(deviceToken);
     var firstNotification = new OneSignal.Notification({
         contents: {
             en: "You have received a new message"
         },
-        include_player_ids: [deviceToken]
+        include_player_ids: [deviceToken],
+        ios_badgeType:"Increase",
+        ios_badgeCount:1
     });
 
     oneSignalClient.sendNotification(firstNotification, function (err, httpResponse,data) {
        if (err) {
            console.log('Something went wrong...');
        } else {
+        //    console.log(httpResponse);
            console.log(data);
        }
     });
