@@ -35,4 +35,6 @@ app.use(require('../route'));
 //     user.create({ fullName: 'Vashram Berani', email: 'scriptbin@gmail.com', password: 'scriptbin..123', mobileNo: '9016981221', verified: 1, "status": "ACTIVE", "userRole": 1 });
 // });
 
+
 module.exports = app;
+

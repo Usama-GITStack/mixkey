@@ -116,7 +116,7 @@ utils.sendEmail = (toEmail, subject, body, callback) => {
     }
     // createTransport({ host: "smtp.gmail.com", port: 587, auth: { user: "username@gmail.com", pass: "app password" } });
     let transporter = nodemailer.createTransport({
-        host: 'multikey.app',
+        host: 'linktologin.com',
         // service: 'gmail',
         port: 25,
         secure: false,
