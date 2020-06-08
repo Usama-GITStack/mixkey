@@ -119,6 +119,7 @@ utils.sendEmail = (toEmail, subject, body, callback) => {
         host: 'multikey.app',
         // service: 'gmail',
         port: 25,
+        secure: false,
         auth: {
             user: 'notifications@multikey.app',
             pass: 'vNe2l16_'
