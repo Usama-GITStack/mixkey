@@ -112,10 +112,12 @@ installationSchema.statics.loadByToken = function(deviceToken, select = {}, call
 };
 
 installationSchema.statics.removeTokens = function(filter, callback) {
-    this.findAllAndRemove(filter, callback);
+    this.remove(filter, callback);
 }
 
 installationSchema.statics.setUserInstallation = function(installationId, owner, callback) {
+    console.log('here');
+    console.log(installationId);
     let conditions = { _id: installationId }
     let notification = notificationUtils.getNotificationType();
     let updateData = { owner: owner, notification: notification, badge: 0 }

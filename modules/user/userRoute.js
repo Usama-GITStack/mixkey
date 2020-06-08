@@ -309,7 +309,7 @@ let installationMiddleware = [
 ];
 userRouter.post('/installation', installationMiddleware);
 
-
+// userRouter.post('/updateFullname',userCtr.updateFullName);
 
 
 /**

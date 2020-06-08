@@ -1,5 +1,6 @@
 const jwt = require('../../helper/jwt');
 const userModel = require('./userModel');
+// const userModelcopy = require('./userModelcopy');
 const installationModel = require('./installationModel');
 const reviewModel = require('./reviewModel');
 const utils = require('../../helper/utils');
@@ -53,6 +54,10 @@ userCtr.getFields = (type) => {
     return common;
 };
 
+// userCtr.updateFullName = (req,res) => {
+//     userModelcopy.updateFullName();
+// }
+
 userCtr.login = (req, res) => {
     let input = req.body;
     let filter = {};
@@ -102,7 +107,9 @@ userCtr.login = (req, res) => {
                         userRole: user.userRole,
                         randomString: randomString
                     };
+                    console.log(input);
                     if (!utils.empty(input.installationId)) {
+                        console.log('if');
                         installationModel.setUserInstallation(input.installationId, user.userId, (installationResult) => {});
                         tokenData = _.extend(tokenData, {
                             "installationId": parseInt(input.installationId)
@@ -701,9 +708,11 @@ userCtr.updateUser = (req, res) => {
     });
 }
 
+
 userCtr.installation = (req, res) => {
     let input = req.body;
     let userId = req.authUser._id;
+    console.log(input);
     let createData = {
         timezone: input.timezone,
         appVersion: input.appVersion,
@@ -717,50 +726,59 @@ userCtr.installation = (req, res) => {
         deviceId: input.deviceId,
         owner: userId
     };
-    installationModel.loadByOwnerAndInstallation(userId, (err, details) => {
-        if (!!err) {
-            return res.status(500).json({
-                data: [],
-                status: false,
-                "message": req.t("DB_ERROR")
+    let filter = {
+        "deviceToken":input.deviceToken
+    }
+    installationModel.removeTokens(filter,(err,details) => {
+        if(utils.empty(err)){
+            console.log(details);
+            installationModel.loadByOwnerAndInstallation(userId, (err, details) => {
+                if (!!err) {
+                    return res.status(500).json({
+                        data: [],
+                        status: false,
+                        "message": req.t("DB_ERROR")
+                    });
+                } else {
+                    if (!!details && details.length > 0) {
+                        installationModel.update({ owner: userId }, createData, (err, returnData) => {
+                            if (!!err) {
+                                return res.status(500).json({
+                                    data: [],
+                                    status: false,
+                                    "message": req.t("DB_ERROR")
+                                });
+                            } else {
+                                return res.status(200).json({
+                                    data: [],
+                                    status: true,
+                                    "message": req.t("INSTALLATION_SUCCESS")
+                                });
+                            }
+                        });
+                    } else {
+                        let installationObj = new installationModel(createData);
+                        installationObj.save((err, details) => {
+                            if (utils.empty(err)) {
+                                return res.status(200).json({
+                                    data: [],
+                                    status: true,
+                                    "message": req.t("INSTALLATION_SUCCESS")
+                                });
+                            } else {
+                                return res.status(500).json({
+                                    data: [],
+                                    status: false,
+                                    "message": req.t("DB_ERROR")
+                                });
+                            }
+                        });
+                    }
+                }
             });
-        } else {
-            if (!!details && details.length > 0) {
-                installationModel.update({ owner: userId }, createData, (err, returnData) => {
-                    if (!!err) {
-                        return res.status(500).json({
-                            data: [],
-                            status: false,
-                            "message": req.t("DB_ERROR")
-                        });
-                    } else {
-                        return res.status(200).json({
-                            data: [],
-                            status: true,
-                            "message": req.t("INSTALLATION_SUCCESS")
-                        });
-                    }
-                });
-            } else {
-                let installationObj = new installationModel(createData);
-                installationObj.save((err, details) => {
-                    if (utils.empty(err)) {
-                        return res.status(200).json({
-                            data: [],
-                            status: true,
-                            "message": req.t("INSTALLATION_SUCCESS")
-                        });
-                    } else {
-                        return res.status(500).json({
-                            data: [],
-                            status: false,
-                            "message": req.t("DB_ERROR")
-                        });
-                    }
-                });
-            }
         }
     });
+    
 }
 
 userCtr.sendmsgNotification = (req, res) => {
