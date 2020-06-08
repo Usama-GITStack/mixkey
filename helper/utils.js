@@ -114,12 +114,14 @@ utils.sendEmail = (toEmail, subject, body, callback) => {
             api_key: ''
         }
     }
-
+    // createTransport({ host: "smtp.gmail.com", port: 587, auth: { user: "username@gmail.com", pass: "app password" } });
     let transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'multikey.app',
+        // service: 'gmail',
+        port: 25,
         auth: {
-            user: 'verify@mutlikey.app',
-            pass: 'Epsonsx230@'
+            user: 'notifications@multikey.app',
+            pass: 'vNe2l16_'
         }
     });
     //smtpTransport = nodemailer.createTransport('smtps://murtu@suitenomics.com:g@KFyt34e@smtp.gmail.com');

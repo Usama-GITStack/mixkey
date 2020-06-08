@@ -92,6 +92,7 @@ userUtil.sendInviteEmail = (userData, loginUser) => {
 };
 userUtil.sendForgotPasswordEmail = (user, pass, cb) => {
     let forgotPasswordContentPath = "./mail_content/forgot_password.html";
+    
     utils.getHtmlContent(forgotPasswordContentPath, (err, content) => {
         let subject = "Forgot Password";
         let now = new Date();
@@ -103,6 +104,8 @@ userUtil.sendForgotPasswordEmail = (user, pass, cb) => {
         content = content.replace("{PASSWORD}", pass);
         content = content.replace("{USERNAME}", user.email);
         content = content.replace(new RegExp("{BASEPATH}", 'g'), process.env.BASE_URL);
+        
+        console.log(content);
         utils.sendEmail(user.email, subject, content, cb);
     });
 };

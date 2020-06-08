@@ -766,6 +766,7 @@ userCtr.installation = (req, res) => {
 userCtr.sendmsgNotification = (req, res) => {
     let userId = req.authUser._id;
     let input = req.body;
+    console.log(req.body);
     installationModel.loadByOwnerAndInstallation(input.userId, (err, deviceDetails) => {
         if (utils.empty(err)) {
             if (!utils.empty(deviceDetails) && deviceDetails.length > 0) {
@@ -911,6 +912,7 @@ userCtr.forgotPassword = (req, res) => {
     let input = req.body;
     userModel.getUserByEmail(input.email, (err, result) => {
         if (!utils.empty(result) && result.length > 0) {
+            console.log(result);
             let pass_ = utils.getRandomString(9);
             result[0].password = pass_;
             userUtil.sendForgotPasswordEmail(result[0], pass_, (err, isEmailSent) => {
