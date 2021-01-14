@@ -334,6 +334,11 @@ let sendmsgNotificationMiddleware = [
 ];
 userRouter.post('/sendmsgNotification', sendmsgNotificationMiddleware);
 
+let sendmsgNotificationMiddlewareAudio = [
+    userCtr.sendmsgNotificationAudio
+];
+userRouter.post('/sendmsgNotificationAudio', sendmsgNotificationMiddlewareAudio);
+
 /**
  * @api {post} /user/getMessages send message notification(push notification)
  * @apiName send message notification(push notification)

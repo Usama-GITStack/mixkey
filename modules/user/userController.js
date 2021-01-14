@@ -784,7 +784,6 @@ userCtr.installation = (req, res) => {
 userCtr.sendmsgNotification = (req, res) => {
     let userId = req.authUser._id;
     let input = req.body;
-    console.log(req.body);
     installationModel.loadByOwnerAndInstallation(input.userId, (err, deviceDetails) => {
         if (utils.empty(err)) {
             if (!utils.empty(deviceDetails) && deviceDetails.length > 0) {
@@ -801,6 +800,70 @@ userCtr.sendmsgNotification = (req, res) => {
                 from: userId,
                 to: input.userId,
                 message: input.message,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            let messageObj = new messageModel(obj);
+            messageObj.save((err) => {
+                if (!!err) {
+                    callback(err);
+                } else {
+                    notificationUtils.sendPusherNotification(input, userId, messageObj, (err, user) => {});
+                    userCtr.updateMessagesId(messageObj._id, userId, input.userId);
+                    callback(null);
+                }
+            })
+        }
+    ], (err) => {
+        if (utils.empty(err)) {
+            return res.status(200).json({
+                data: [],
+                status: true,
+                "message": req.t("MSG_SEND_SUCCESS")
+            });
+        } else {
+            return res.status(500).json({
+                data: [],
+                status: false,
+                "message": err
+            });
+        }
+    })
+}
+
+userCtr.sendmsgNotificationAudio = (req, res) => {
+    let userId = req.authUser._id;
+    let input = req.body;
+    installationModel.loadByOwnerAndInstallation(input.userId, (err, deviceDetails) => {
+        if (utils.empty(err)) {
+            if (!utils.empty(deviceDetails) && deviceDetails.length > 0) {
+                notificationUtils.sendPushNotification(input, deviceDetails[0].deviceToken, (err, user) => {});
+            }
+        }
+    });
+    
+    waterfall([
+        (callback) => {
+            if(input.type == "audio"){
+                if (!utils.empty(input) && !utils.empty(input.audio)) {
+                        userUtil.saveAudio(input, (result) => {
+                            if (!utils.empty(result.error)) {
+                                callback(result.error, "");
+                            } else {
+                                callback(null, result.data[0]);
+                            }
+                        });
+                        // utils.uploadImageInServer(req.files.profilePic, config.USER_IMAGE_PATH, '', (err, imageName) => {
+                        //     console.log(err, 'image upload')
+                        //     callback(null, imageName);
+                        // });
+                    }
+            }
+            let obj = {
+                from: userId,
+                to: input.userId,
+                message: input.message,
+                audio:input.audio,
                 createdAt: new Date(),
                 updatedAt: new Date()
             };

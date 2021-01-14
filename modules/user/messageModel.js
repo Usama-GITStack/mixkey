@@ -26,6 +26,10 @@ let messagesSchema = new schema({
         type: String,
         required: false,
     },
+    audio: {
+        type: String,
+        required: false,
+    },
     createdAt: {
         type: Date,
         default: new Date()

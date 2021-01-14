@@ -146,6 +146,14 @@ userUtil.saveUserProfilePicture = (file, cb) => {
     }
 };
 
+userUtil.saveAudio = (file, cb) => {
+    if (!utils.empty(file) && !utils.empty(file.profilePic) && file.profilePic) {
+        utils.uploadImage([file.profilePic], config.USER_IMAGE_PATH, "files", cb);
+    } else {
+        cb({ "data": [], "error": "" });
+    }
+};
+
 userUtil.saveUserProfilePictureByUrl = (file, cb) => {
     if (!utils.empty(file)) {
         utils.uploadImage([file], config.USER_IMAGE_PATH, "files", cb);
