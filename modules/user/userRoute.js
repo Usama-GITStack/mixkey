@@ -335,6 +335,9 @@ let sendmsgNotificationMiddleware = [
 userRouter.post('/sendmsgNotification', sendmsgNotificationMiddleware);
 
 let sendmsgNotificationMiddlewareAudio = [
+    multipartMiddleware,
+    auth.isAuthenticatedUser,
+    userMiddleware.validateInput("sendmsgNotificationAudio"),
     userCtr.sendmsgNotificationAudio
 ];
 userRouter.post('/sendmsgNotificationAudio', sendmsgNotificationMiddlewareAudio);
