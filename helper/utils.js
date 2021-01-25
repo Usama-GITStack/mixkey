@@ -240,6 +240,7 @@ utils.uploadFileToBuckets = (file, type, extension, referenceId, storagePath, cb
 }
 
 utils.uploadFile = (file, storagePath, type, cb) => {
+    //console.log("uploadFile");
     let files = file;
     let currentFile = utils;
     let response = { "data": [], "error": "" };
@@ -311,6 +312,7 @@ utils.uploadFile = (file, storagePath, type, cb) => {
 }
 
 utils.uploadImage = (file, storagePath, type, cb) => {
+    //console.log("uploadImage");
     let currentFile = utils;
     let urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
     let returnResponse = (file, type) => {
@@ -324,9 +326,11 @@ utils.uploadImage = (file, storagePath, type, cb) => {
 
             response.on('data', function(chunk) {
                 chunks.push(chunk);
+                console.log("dfghjkdfgh");
             }).on('error', function(resp) {
                 console.log(resp);
             }).on('end', function() {
+                console.log("waja");
                 let buffer = Buffer.concat(chunks);
 
                 let dimensions = sizeOf(buffer);

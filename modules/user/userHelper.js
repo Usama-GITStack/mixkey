@@ -147,8 +147,9 @@ userUtil.saveUserProfilePicture = (file, cb) => {
 };
 
 userUtil.saveAudio = (file, cb) => {
-    if (!utils.empty(file) && !utils.empty(file.profilePic) && file.profilePic) {
-        utils.uploadImage([file.profilePic], config.USER_IMAGE_PATH, "files", cb);
+    if (!utils.empty(file) && !utils.empty(file.audio) && file.audio) {
+        //console.log("saveAudio");
+        utils.uploadImage([file.audio], config.USER_IMAGE_PATH, "files", cb);
     } else {
         cb({ "data": [], "error": "" });
     }

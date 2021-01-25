@@ -844,7 +844,9 @@ userCtr.sendmsgNotificationAudio = (req, res) => {
     
     waterfall([
         (callback) => {
+            console.log(input);
             if(input.type == "audio"){
+                //console.log("herre");
                 if (!utils.empty(input) && !utils.empty(input.audio)) {
                         userUtil.saveAudio(input, (result) => {
                             if (!utils.empty(result.error)) {
