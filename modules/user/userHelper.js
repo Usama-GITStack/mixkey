@@ -139,6 +139,7 @@ userUtil.sendContactEmail = (user, cb) => {
 };
 
 userUtil.saveUserProfilePicture = (file, cb) => {
+    //console.log("142 file",file);
     if (!utils.empty(file) && !utils.empty(file.profilePic) && file.profilePic) {
         utils.uploadImage([file.profilePic], config.USER_IMAGE_PATH, "files", cb);
     } else {
@@ -146,16 +147,16 @@ userUtil.saveUserProfilePicture = (file, cb) => {
     }
 };
 
-userUtil.saveAudio = (file, cb) => {
-    if (!utils.empty(file) && !utils.empty(file.audio) && file.audio) {
-        //console.log("saveAudio");
-        utils.uploadImage([file.audio], config.USER_IMAGE_PATH, "files", cb);
-    } else {
-        cb({ "data": [], "error": "" });
-    }
-};
+// userUtil.saveAudio = (file, cb) => {
+//     if (!utils.empty(file) && !utils.empty(file.audio) && file.audio) {
+//         utils.uploadImage([file.audio], config.USER_IMAGE_PATH, "files", cb);
+//     } else {
+//         cb({ "data": [], "error": "" });
+//     }
+// };
 
 userUtil.saveUserProfilePictureByUrl = (file, cb) => {
+    //console.log("159 file",file);
     if (!utils.empty(file)) {
         utils.uploadImage([file], config.USER_IMAGE_PATH, "files", cb);
     } else {

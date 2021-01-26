@@ -249,15 +249,25 @@ utils.uploadFile = (file, storagePath, type, cb) => {
     // configS3 = _.extend(configS3, { apiVersion: '2006-03-01' });
     let s3 = new AWS.S3(configS3);
     if (type == "files") {
+       // console.log("files",files);
         for (var key in files) {
+            //console.log("key",key);
             let file = files[key];
+            //console.log("file",file);
             let oldFilename = file.path;
+            //console.log("oldFilename",oldFilename);
             let fileName = file.name;
+            //console.log("fileName",fileName);
             let extension = path.extname(fileName);
+            //console.log("extension",extension);
             let baseFileName = path.basename(fileName, extension);
+            //console.log("baseFileName",baseFileName);
             let newFilename = baseFileName + "_" + (key + 1) + "_" + Date.now() + extension;
+            //console.log("newFilename",newFilename);
             let newPath = storagePath + newFilename;
+            //console.log("newPath",newPath);
             let data = fs.readFileSync(oldFilename);
+            //console.log("data",data);   
             fileData.push({
                 "data": data,
                 "type": file.type,
@@ -267,8 +277,10 @@ utils.uploadFile = (file, storagePath, type, cb) => {
             fs.unlink(file.path, (err) => {
                 console.log(err);
             });
+            //console.log("272");
         }
     } else {
+        console.log("273");
         for (var key in files) {
             let file = files[key];
             let data = currentFile.decodeBase64File(file);
@@ -283,7 +295,9 @@ utils.uploadFile = (file, storagePath, type, cb) => {
             });
         }
     }
+    //console.log("288");
     if (fileData.length > 0) {
+        console.log("290");
         async.eachSeries(fileData, (file, callback) => {
             let params = {
                 Bucket: process.env.BUCKET_NAME,
@@ -306,6 +320,7 @@ utils.uploadFile = (file, storagePath, type, cb) => {
             cb(response);
         });
     } else {
+        console.log("response",response);
         cb(response);
     }
     //cb(response);
